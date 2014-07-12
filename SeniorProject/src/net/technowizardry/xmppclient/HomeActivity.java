@@ -1,30 +1,24 @@
 package net.technowizardry.xmppclient;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
+import android.widget.LinearLayout;
 
-public class MainActivity extends Activity {
-
+public class HomeActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login_screen);
-	}
-	
-	public void onClick(View v) {
-		final int id = v.getId();
-		switch(id) {
-		case R.id.signInButton:
-			startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-			finish();
-			break;
-		case R.id.createAccount:
-			startActivity(new Intent(getApplicationContext(), CreateAccountActivity.class));
-			break;
+		setContentView(R.layout.home_screen);
+		
+		LinearLayout fragContainer = (LinearLayout) findViewById(R.id.homeMainLLayout);
+		for(int i = 0; i < 15; i++) {
+	        LinearLayout ll = new LinearLayout(this);
+	        ll.setOrientation(LinearLayout.HORIZONTAL);
+	        ll.setId(1234+i); 
+	        getFragmentManager().beginTransaction().add(ll.getId(), new ContactCardFragment()).commit();
+	        fragContainer.addView(ll);
 		}
 	}
 	

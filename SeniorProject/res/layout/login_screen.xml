@@ -1,0 +1,64 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/createAccount"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    android:background="#000000"
+    android:orientation="vertical" >
+
+    <EditText
+        android:id="@+id/loginUsername"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/loginPassword"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="18dp"
+        android:background="#888888"
+        android:ems="14"
+        android:hint="@string/enterEmailAddress"
+        android:inputType="textEmailAddress"
+        android:singleLine="true"
+        android:textColor="#00000000"
+        android:textColorHint="#66000000"
+        android:textSize="15sp" >
+
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/signInButton"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerVertical="true"
+        android:onClick="onClick"
+        android:text="@string/Sign_In" />
+
+    <EditText
+        android:id="@+id/loginPassword"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/signInButton"
+        android:layout_alignLeft="@+id/loginUsername"
+        android:layout_marginBottom="15dp"
+        android:background="#888888"
+        android:ems="14"
+        android:hint="@string/enterPassword"
+        android:inputType="textPassword"
+        android:singleLine="true"
+        android:textColorHint="#66000000"
+        android:textSize="15sp" />
+
+    <TextView
+        android:id="@+id/createAccount"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignRight="@+id/signInButton"
+        android:layout_below="@+id/signInButton"
+        android:layout_marginTop="16dp"
+        android:clickable="true"
+        android:onClick="onClick"
+        android:text="@string/createAccount"
+        android:textColor="#EEEEEE"
+        android:textSize="@dimen/createAccount" />
+
+</RelativeLayout>

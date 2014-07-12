@@ -1,31 +1,15 @@
 package net.technowizardry.xmppclient;
 
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-public class MainActivity extends Activity {
-
-	@Override
+public class ChatActivity extends Activity {
+	
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login_screen);
-	}
-	
-	public void onClick(View v) {
-		final int id = v.getId();
-		switch(id) {
-		case R.id.signInButton:
-			startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-			finish();
-			break;
-		case R.id.createAccount:
-			startActivity(new Intent(getApplicationContext(), CreateAccountActivity.class));
-			break;
-		}
+		setContentView(R.layout.chat_screen);
 	}
 	
 	@Override

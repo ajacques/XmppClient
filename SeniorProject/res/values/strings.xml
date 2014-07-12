@@ -4,5 +4,13 @@
     <string name="app_name">XmppClient</string>
     <string name="hello_world">Hello world!</string>
     <string name="action_settings">Settings</string>
+    <string name="Sign_In">Sign In</string>
+    <string name="enterEmailAddress">Enter Email Address</string>
+    <string name="enterPassword">Password</string>
+    <string name="userImage">User Image</string>
+    <string name="UITestUsername">Username</string>
+    <string name="UITestConv">Conversation</string>
+    <string name="UITestDate">Date</string>
+    <string name="createAccount">Create Account</string>
 
 </resources>
