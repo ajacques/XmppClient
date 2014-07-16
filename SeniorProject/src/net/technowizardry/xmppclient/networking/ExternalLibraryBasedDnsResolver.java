@@ -18,6 +18,8 @@ public class ExternalLibraryBasedDnsResolver implements DnsResolver {
 		lookup.setResolver(new SimpleResolver());
 		lookup.run();
 
+		validateResultCode(lookup);
+
 		List<ServiceRecord> results = new ArrayList<ServiceRecord>();
 
 		for (Record record : lookup.getAnswers()) {
@@ -26,5 +28,15 @@ public class ExternalLibraryBasedDnsResolver implements DnsResolver {
 		}
 
 		return results;
+	}
+
+	private void validateResultCode(Lookup lookup) {
+		switch (lookup.getResult())
+		{
+		case Lookup.SUCCESSFUL:
+			return;
+		default:
+			throw new RuntimeException("Un-expected error occurred while attempting DNS lookup")
+		}
 	}
 }
