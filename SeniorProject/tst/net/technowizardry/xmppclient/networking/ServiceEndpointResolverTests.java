@@ -5,6 +5,8 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.junit.Test;
+
 import junit.framework.TestCase;
 
 public class ServiceEndpointResolverTests extends TestCase {
@@ -27,8 +29,10 @@ public class ServiceEndpointResolverTests extends TestCase {
 		resolver = new ServiceEndpointResolver(new LocalResolver());
 	}
 
+	@Test
 	public void testFindEndpoint() throws IOException {
 		List<HostnameEndPoint> targets = resolver.performSRVLookup("domain.local");
 		assertNotNull(targets);
+		assertEquals(1, targets.size());
 	}
 }

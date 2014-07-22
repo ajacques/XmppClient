@@ -36,7 +36,7 @@ public class ExternalLibraryBasedDnsResolver implements DnsResolver {
 		case Lookup.SUCCESSFUL:
 			return;
 		default:
-			throw new RuntimeException("Un-expected error occurred while attempting DNS lookup")
+			throw new RuntimeException("Un-expected error occurred while attempting DNS lookup");
 		}
 	}
 }
