@@ -4,7 +4,8 @@
     android:layout_height="60dp"
     android:layout_marginBottom="1dp"
     android:background="#444444"
-    android:orientation="horizontal" >
+    android:orientation="horizontal"
+    android:clickable="true" >
 
     <ImageView
         android:id="@+id/imageView2"

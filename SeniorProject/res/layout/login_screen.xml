@@ -1,11 +1,11 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/createAccount"
+    android:id="@+id/loginScreenRelativeLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
     android:background="#000000"
     android:orientation="vertical" >
 
-    <EditText
+   <EditText
         android:id="@+id/loginUsername"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -17,11 +17,9 @@
         android:hint="@string/enterEmailAddress"
         android:inputType="textEmailAddress"
         android:singleLine="true"
-        android:textColor="#00000000"
+        android:textColor="#000000"
         android:textColorHint="#66000000"
         android:textSize="15sp" >
-
-        <requestFocus />
     </EditText>
 
     <Button
@@ -60,5 +58,14 @@
         android:text="@string/createAccount"
         android:textColor="#EEEEEE"
         android:textSize="@dimen/createAccount" />
+
+    <TextView
+        android:id="@+id/invalidUsernameTextView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/loginPassword"
+        android:layout_alignLeft="@+id/loginPassword"
+        android:text=""
+        android:textColor="#EE0000" />
 
 </RelativeLayout>

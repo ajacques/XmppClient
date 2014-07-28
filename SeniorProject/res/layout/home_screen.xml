@@ -3,8 +3,8 @@
     android:id="@+id/homeMainSLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
->
-    
+    android:background="#000000">
+
     <LinearLayout
 	    android:id="@+id/homeMainLLayout"
 	    android:layout_width="match_parent"

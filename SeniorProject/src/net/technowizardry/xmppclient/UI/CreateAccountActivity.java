@@ -1,33 +1,18 @@
-package net.technowizardry.xmppclient;
+package net.technowizardry.xmppclient.ui;
 
+import net.technowizardry.xmppclient.R;
 import android.app.Activity;
-import android.content.Intent;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 
-public class MainActivity extends Activity {
-
+public class CreateAccountActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		setContentView(R.layout.login_screen);
+		setContentView(R.layout.create_account);
 	}
-	
-	public void onClick(View v) {
-		final int id = v.getId();
-		switch(id) {
-		case R.id.signInButton:
-			startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-			finish();
-			break;
-		case R.id.createAccount:
-			startActivity(new Intent(getApplicationContext(), CreateAccountActivity.class));
-			break;
-		}
-	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
@@ -46,5 +31,5 @@ public class MainActivity extends Activity {
 		}
 		return super.onOptionsItemSelected(item);
 	}
-	
+
 }
