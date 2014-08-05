@@ -1,23 +1,24 @@
 package net.technowizardry.xmppclient.networking
 
 import java.io.{InputStream,OutputStream}
-import javax.xml.stream.{XMLStreamWriter,XMLOutputFactory,XMLStreamReader,XMLInputFactory}
+import net.technowizardry.{XMLReader,XMLWriter,XMLStreamFactory}
 
-class XmppStream(inputStream: InputStream, outputStream: OutputStream, messageReader : XMLStreamReader => Unit) {
-	var writer : XMLStreamWriter = XMLOutputFactory.newFactory().createXMLStreamWriter(outputStream, "utf-8")
-	var reader : XMLStreamReader = _
+class XmppStream(inputStream: InputStream, outputStream: OutputStream, streamFactory : XMLStreamFactory, messageReader : XMLReader => Unit) {
+	var writer : XMLWriter = streamFactory.CreateWriter(outputStream)
+	var reader : XMLReader = _
 	var readThread : Thread = _
 
+	writer.WriteStartDocument("utf-8", "1.0")
 	def SendMessage(message : XmppProtocolMessage) {
 		message.WriteMessage(writer)
-		writer.flush
 	}
+	def Flush() = writer.Flush
 	def StartReaderThread() {
 		readThread = new Thread(new Runnable {
 			def run() {
-				reader = XMLInputFactory.newInstance().createXMLStreamReader(inputStream)
-				while (reader.hasNext) {
-					reader.next
+				reader = streamFactory.CreateReader(inputStream)
+				while (reader.HasNext()) {
+					reader.Next()
 					messageReader(reader)
 				}
 			}

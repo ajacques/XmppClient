@@ -1,8 +1,11 @@
 package net.technowizardry.xmppclient.networking
 
-import javax.xml.stream.XMLStreamWriter
+import net.technowizardry.{XMLWriter,XMLReader}
 
 abstract class XmppProtocolMessage {
-	val StreamsNS = "http://etherx.jabber.org/streams";
-	def WriteMessage(writer: XMLStreamWriter)
+	def WriteMessage(writer: XMLWriter)
+}
+
+trait XmppProtocolMessageTrait {
+	def Unpack(reader : XMLReader) : XmppProtocolMessage
 }

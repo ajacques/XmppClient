@@ -2,23 +2,21 @@ package net.technowizardry.xmppclient.networking
 
 import java.io.InputStream
 import java.io.OutputStream
-import javax.xml.stream.XMLStreamReader
+import net.technowizardry.{XMLReader,XMLStreamFactory}
 
-class XmppConnection(domain: String, username: String) {
+class XmppConnection(domain: String, username: String, streamFactory : XMLStreamFactory) {
 	var stream : XmppStream = _
-	val test = (this.HandleMessage _)
+	val msgfactory = new XmppMessageFactory
 	def Negotiate(input: InputStream, output: OutputStream) {
-		stream = new XmppStream(input, output, HandleMessage) 
+		stream = new XmppStream(input, output, streamFactory, HandleMessage)
 		stream.StartReaderThread
 		stream.SendMessage(new StreamInitMessage(domain))
+		stream.Flush()
 	}
 	def Disconnect() {
 		stream.Shutdown
 	}
-	def myMethod4[A](f: A => Unit, a: A): Unit = {
-		val value = f(a)
-		()
-	}
-	private def HandleMessage(reader : XMLStreamReader) {
+	private def HandleMessage(reader : XMLReader) {
+		val msg = msgfactory.FromXMLReader(reader)
 	}
 }
