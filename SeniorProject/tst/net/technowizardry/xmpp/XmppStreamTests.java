@@ -1,4 +1,4 @@
-package net.technowizardry.xmppclient.networking;
+package net.technowizardry.xmpp;
 
 import static org.junit.Assert.*;
 
@@ -16,6 +16,7 @@ import net.technowizardry.XMLReader;
 import net.technowizardry.XMLStreamFactory;
 import net.technowizardry.XMLStreamFactoryFactory;
 import net.technowizardry.XMLWriter;
+import net.technowizardry.xmpp.messages.WritableXmppMessage;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -33,7 +34,7 @@ public class XmppStreamTests {
 	private Semaphore messageLatch = new Semaphore(0);
 	private XMLReader reader;
 
-	private class DummyMessage extends XmppProtocolMessage {
+	private class DummyMessage implements WritableXmppMessage {
 		@Override
 		public void WriteMessage(XMLWriter writer) {
 			writer.WriteText(TEST_STRING);
@@ -56,6 +57,7 @@ public class XmppStreamTests {
 			}
 		};
 		stream = new XmppStream(inputStream, outputStream, streamFactory, readerListener);
+		stream.Flush();
 		XMLReader reader = streamFactory.CreateReader(toServerStream);
 		assertTrue(reader.HasNext());
 		assertEquals(XMLObjectType.Document(), reader.NodeType());
@@ -64,6 +66,7 @@ public class XmppStreamTests {
 	@Test
 	public void testSendMessage() throws IOException {
 		stream.SendMessage(new DummyMessage());
+		stream.Flush();
 		assertEquals(TEST_STRING, readAll());
 	}
 
@@ -76,7 +79,7 @@ public class XmppStreamTests {
 		assertEquals(XMLObjectType.StartElement(), reader.NodeType());
 		assertEquals("stream", reader.LocalName());
 		assertEquals("foobar", reader.NamespaceURI());
-		assertEquals("attrib_value", reader.GetAttributeValue("attrib"));
+		assertEquals("attrib_value", reader.GetAttributeValue("foobar", "attrib"));
 		messageLatch.release();
 		stream.Shutdown();
 	}

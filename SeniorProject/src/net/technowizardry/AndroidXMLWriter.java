@@ -67,18 +67,19 @@ public class AndroidXMLWriter implements XMLWriter {
 	@Override
 	public void WriteDefaultNamespace(String namespace) {
 		// TODO Auto-generated method stub
-		
 	}
 
 	@Override
 	public void WriteText(String text) {
 		// TODO Auto-generated method stub
-		
+	}
+
+	@Override
+	public void WriteEndElement() {
 	}
 
 	@Override
 	public void WriteStartElement(String elemName, String namespace) {
 		// TODO Auto-generated method stub
-		
 	}
 }

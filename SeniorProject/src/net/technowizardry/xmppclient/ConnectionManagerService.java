@@ -6,7 +6,7 @@ import java.net.UnknownHostException;
 
 import net.technowizardry.xmppclient.networking.ExternalLibraryBasedDnsResolver;
 import net.technowizardry.xmppclient.networking.ServiceEndpointResolver;
-import net.technowizardry.xmppclient.networking.XmppConnection;
+import net.technowizardry.xmpp.XmppConnection;
 import net.technowizardry.xmppclient.networking.XmppSocketFactory;
 import android.app.Service;
 import android.content.Context;
@@ -45,7 +45,7 @@ public class ConnectionManagerService extends Service {
 	private void XmppConnect() {
 		Thread t = new Thread(){
 			public void run() {
-				connection = new XmppConnection(domain, localName);
+				connection = new XmppConnection(domain, localName, null, null);
 				factory = new XmppSocketFactory(new ServiceEndpointResolver(new ExternalLibraryBasedDnsResolver()));
 				Socket socket = null;
 				try {

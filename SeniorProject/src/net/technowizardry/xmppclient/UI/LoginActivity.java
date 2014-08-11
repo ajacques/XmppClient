@@ -5,9 +5,9 @@ import java.util.List;
 
 import net.technowizardry.xmppclient.R;
 import net.technowizardry.xmppclient.networking.*;
+import net.technowizardry.HostnameEndPoint;
 import net.technowizardry.xmppclient.ui.CreateAccountActivity;
 import net.technowizardry.xmppclient.ui.HomeActivity;
-
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;

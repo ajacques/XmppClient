@@ -5,6 +5,11 @@ import java.net.Socket;
 import java.net.UnknownHostException;
 import java.util.List;
 
+import net.technowizardry.HostnameEndPoint;
+
+/**
+ * Class that is responsible for opening socket connections to a host responsible for the given XMPP domain
+ */
 public class XmppSocketFactory {
 	private final ServiceEndpointResolver resolver;
 

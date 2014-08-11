@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.technowizardry.HostnameEndPoint;
+
 public class ServiceEndpointResolver {
 	private final DnsResolver dnsResolver;
 

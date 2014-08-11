@@ -5,6 +5,11 @@ import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 
+import net.technowizardry.HostnameEndPoint;
+import net.technowizardry.xmppclient.networking.DnsResolver;
+import net.technowizardry.xmppclient.networking.ServiceEndpointResolver;
+import net.technowizardry.xmppclient.networking.ServiceRecord;
+
 import org.junit.Test;
 
 import junit.framework.TestCase;

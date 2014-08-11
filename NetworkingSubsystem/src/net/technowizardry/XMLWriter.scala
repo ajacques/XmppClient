@@ -8,5 +8,6 @@ trait XMLWriter {
 	def WriteNamespace(prefix : String, namespace : String)
 	def WriteDefaultNamespace(namespace : String)
 	def WriteText(text : String)
+	def WriteEndElement()
 	def Flush()
 }

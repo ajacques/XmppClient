@@ -1,7 +1,10 @@
-package net.technowizardry.xmppclient.networking;
+package net.technowizardry.xmpp;
 
 import java.net.UnknownHostException;
 import java.util.List;
+
+import net.technowizardry.xmppclient.networking.ExternalLibraryBasedDnsResolver;
+import net.technowizardry.xmppclient.networking.ServiceRecord;
 
 import org.junit.Before;
 import org.junit.Test;
