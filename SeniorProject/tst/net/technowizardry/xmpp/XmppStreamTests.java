@@ -11,6 +11,7 @@ import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.Semaphore;
 
+import junit.framework.TestCase;
 import net.technowizardry.XMLObjectType;
 import net.technowizardry.XMLReader;
 import net.technowizardry.XMLStreamFactory;
@@ -25,7 +26,7 @@ import scala.Function1;
 import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
 
-public class XmppStreamTests {
+public class XmppStreamTests extends TestCase {
 	private static final String TEST_STRING = "TEST_STRING";
 	private final XMLStreamFactory streamFactory = XMLStreamFactoryFactory.newInstance();
 	private XmppStream stream;

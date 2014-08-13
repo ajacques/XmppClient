@@ -1,6 +1,7 @@
 package net.technowizardry.xmpp.messages;
 
 import static org.junit.Assert.*;
+import junit.framework.TestCase;
 import net.technowizardry.XMLObjectType;
 import net.technowizardry.XMLReader;
 import net.technowizardry.xmpp.XmlReaderHelpers;
@@ -11,7 +12,7 @@ import org.junit.Test;
 
 import scala.collection.immutable.List;
 
-public class StreamInitMessageTests {
+public class StreamInitMessageTests extends TestCase {
 	@Test
 	public void testNoFeatures() {
 		StreamInitMessage message = unpackMessage(XmppPackets.buildStreamInit());

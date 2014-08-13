@@ -1,7 +1,7 @@
 package net.technowizardry.xmpp;
 
 import static org.junit.Assert.*;
-
+import junit.framework.TestCase;
 import net.technowizardry.XMLReader;
 import net.technowizardry.xmpp.messages.StreamInitMessage;
 import net.technowizardry.xmpp.messages.StreamInitMessageParser;
@@ -12,7 +12,7 @@ import org.junit.Test;
 
 import scala.collection.immutable.List;
 
-public class StreamInitMessageTests {
+public class StreamInitMessageTests extends TestCase {
 	private static final String TEST_SERVER = "technowizardry.net";
 
 	@Before
