@@ -13,7 +13,15 @@ class StreamInitMessage(server: String, features : List[XmppFeature]) extends Xm
 		writer.WriteText("")
 	}
 	def SupportsStartTls() = SupportsFeature("starttls", XmppNamespaces.Tls)
+	def SupportsCompression() = SupportsFeature("compress", XmppNamespaces.Compression)
 	def SupportsFeature(name : String, namespace : String) = features.exists(p => p.GetNamespace() == namespace && p.GetName() == name)
+	def GetFeature(name : String, ns : String) = features.find(p => p.GetNamespace() == ns && p.GetName() == name).orNull
+	def GetMechanisms() = {
+		GetFeature("mechanisms", XmppNamespaces.Sasl) match {
+			case m : XmppMechanismFeature => m.GetMechanisms()
+		}
+	}
+	def IsFeatureRequired(name : String, namespace : String) = features.exists(p => p.GetNamespace() == namespace && p.GetName() == name && p.IsRequired())
 	def GetServer() = server
 	def GetFeatures() = features
 }
@@ -24,7 +32,7 @@ class XmppFeature(ns : String, name : String, required : Boolean) {
 	def IsRequired() = required
 }
 
-class XmppMechanismFeature(ns : String, name : String, required : Boolean, mechs : Array[String]) extends XmppFeature(ns, name, required) {
+class XmppMechanismFeature(ns : String, name : String, mechs : List[String]) extends XmppFeature(ns, name, false) {
 	def GetMechanisms() = mechs
 	def SupportsMechanism(mechanism : String) = mechs.exists(mech => mech == mechanism)
 }
@@ -50,16 +58,39 @@ object StreamInitMessageParser {
 		var local = reader.LocalName()
 		var ns = reader.NamespaceURI()
 		var req = false
-		reader.Next()
-		if (reader.NodeType() == XMLObjectType.StartElement) {
-			reader.LocalName() match {
-				case "required" => req = true
-				case "mechanism" =>
+		reader.LocalName() match {
+			case "mechanisms" => {
+				return new XmppMechanismFeature(ns, local, UnpackMechanisms(reader))
 			}
-			reader.Next() // Advance to </feature>
+			case _ => {
+				reader.Next()
+				while (reader.NodeType() == XMLObjectType.StartElement) {
+					reader.LocalName() match {
+						case "required" => {
+							req = true
+							reader.Next()
+						}
+						case _ => { // Don't know how to handle this. Collapse the stack
+							reader.ReadUntilEndElement(reader.NamespaceURI(), reader.LocalName())
+						}
+					}
+					reader.Next() // Advance to </feature>
+				}
+				reader.Next() // Advance to next <feature> or </features>
+				// We might be in an unsafe state here
+				return new XmppFeature(ns, local, req)
+			}
 		}
-		reader.Next() // Advance to next <feature> or </features>
-		// We might be in an unsafe state here
-		return new XmppFeature(ns, local, req)
+	}
+	private def UnpackMechanisms(reader : XMLReader) : List[String] = {
+		reader.Next()
+		var mechs = List[String]()
+		while (reader.LocalName() != "mechanisms") {
+			//reader.Next()
+			mechs ::= reader.ElementText()
+			reader.Next()
+		}
+		reader.Next()
+		return mechs
 	}
 }

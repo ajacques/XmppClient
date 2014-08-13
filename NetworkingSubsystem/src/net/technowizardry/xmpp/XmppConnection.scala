@@ -8,7 +8,10 @@ import net.technowizardry.xmpp.messages._
 class XmppConnection(domain: String, username: String, password : String, streamFactory : XMLStreamFactory) {
 	private var stream : XmppStream = _
 	private var state = XmppConnectionState.NotConnected
+	var msghandlers = Map[Class[_], XmppProtocolMessage => Unit]()
 	val msgfactory = new XmppMessageFactory
+	val authenticator = new XmppAuthenticator(this, username, password)
+	val initiator = new TlsSessionInitiator(domain, 5222)
 	def Negotiate(input: InputStream, output: OutputStream) {
 		stream = new XmppStream(input, output, streamFactory, HandleMessage)
 		stream.StartReaderThread
@@ -16,8 +19,17 @@ class XmppConnection(domain: String, username: String, password : String, stream
 		stream.Flush
 		state = XmppConnectionState.ConnectionEstablished
 	}
+	def SendMessageImmediately(message : WritableXmppMessage) = {
+		stream.SendMessage(message)
+		stream.Flush()
+	}
 	def Disconnect() {
+		stream.SendMessage(new StreamCloseMessage())
+		stream.Flush()
 		stream.Shutdown
+	}
+	def RegisterMessageCallback(msgtype : Class[_], handler : XmppProtocolMessage => Unit) {
+		msghandlers += (msgtype -> handler)
 	}
 	def GetState() = state
 	private def HandleMessage(reader : XMLReader) {
@@ -26,29 +38,32 @@ class XmppConnection(domain: String, username: String, password : String, stream
 	}
 	private def InvokeMessageHandler(message : XmppProtocolMessage) {
 		println("Received message of type: " + message.getClass().getName())
-		message match {
-			case si : StreamInitMessage => HandleStreamInitMessage(si)
-			case s : StartTlsProceedMessage => NegotiateTLS()
-			case s : SaslSuccessMessage => FinalizeAuthentication()
+		msghandlers.get(message.getClass()) match {
+			case Some(f) => f(message)
+			case _ => {
+				message match {
+					case si : StreamInitMessage => HandleStreamInitMessage(si)
+					case s : StartTlsProceedMessage => NegotiateTLS()
+					case s : SaslSuccessMessage => FinalizeAuthentication()
+				}
+			}
 		}
 	}
 	private def HandleStreamInitMessage(message : StreamInitMessage) {
+		message.GetFeatures().foreach(f => println(String.format("Feature: %s:%s", f.GetNamespace(), f.GetName())))
 		if (message.SupportsStartTls) {
 			stream.SendMessage(new StartTlsMessage())
 			stream.Flush
 		} else {
-			stream.SendMessage(new SaslPlainAuthMessage(username, password))
-			stream.Flush()
+			authenticator.AttemptAuthentication(message.GetMechanisms())
 		}
 	}
-	def NegotiateTLS() {
+	private def NegotiateTLS() {
 		stream.Shutdown // Tear the exist XMPP session down
 
-		// Initiator should be passed to the XmppConnection constructor for dependency injection
-		val initiator = new TlsSessionInitiator(domain, 5222)
 		initiator.Negotiate(stream.GetInnerInputStream(), stream.GetInnerOutputStream(), CompleteTLSNegotiation)
 	}
-	def FinalizeAuthentication() {
+	private def FinalizeAuthentication() {
 		state = XmppConnectionState.Authenticated
 	}
 	private def CompleteTLSNegotiation(input : InputStream, output : OutputStream) {

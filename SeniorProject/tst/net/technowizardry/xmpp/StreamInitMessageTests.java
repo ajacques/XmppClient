@@ -37,7 +37,7 @@ public class StreamInitMessageTests {
 		assertEquals(1, features.size());
 		XmppFeature feature = features.head();
 		assertNotNull(feature);
-		assertFalse(feature.IsRequired());
+		assertTrue(feature.IsRequired());
 		assertEquals(XmppNamespaces.Tls(), feature.GetNamespace());
 		assertEquals("starttls", feature.GetName());
 	}
