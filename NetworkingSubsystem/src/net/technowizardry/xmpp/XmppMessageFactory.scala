@@ -12,11 +12,15 @@ class XmppMessageFactory {
 	parsers += (GetKey(XmppNamespaces.Sasl, "challenge") -> SaslParser.UnpackChallenge)
 	parsers += (GetKey(XmppNamespaces.Sasl, "failure") -> SaslParser.UnpackFailure)
 	parsers += (GetKey(XmppNamespaces.Sasl, "success") -> SaslParser.UnpackSuccess)
+	parsers += (GetKey(XmppNamespaces.Jabber, "iq") -> IqParser.Unpack)
 	def FromXMLReader(reader : XMLReader) : XmppProtocolMessage = {
 		var ns = reader.NamespaceURI
 		var name = reader.LocalName
 		var parser = FindParserForGlobalName(ns, name)
 		val msg = parser(reader)
+		if (!reader.IsExpectedEndElement(ns, name)) {
+			println(String.format("WARNING: Possible unbalanced XML Reader (Cursor: %s) (Responsible Parser: %s)", reader, parser.toString()));
+		}
 		return msg
 	}
 	def FindParserForGlobalName(namespace : String, name : String) : XMLReader => XmppProtocolMessage = {

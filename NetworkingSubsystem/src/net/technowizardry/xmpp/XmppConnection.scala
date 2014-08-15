@@ -6,18 +6,23 @@ import net.technowizardry._
 import net.technowizardry.xmpp.messages._
 
 class XmppConnection(domain: String, username: String, password : String, streamFactory : XMLStreamFactory) {
+	private val msgfactory = new XmppMessageFactory
+	private val authenticator = new XmppAuthenticator(this, username, password)
+	private val initiator = new TlsSessionInitiator(domain, 5222)
 	private var stream : XmppStream = _
 	private var state = XmppConnectionState.NotConnected
-	var msghandlers = Map[Class[_], XmppProtocolMessage => Unit]()
-	val msgfactory = new XmppMessageFactory
-	val authenticator = new XmppAuthenticator(this, username, password)
-	val initiator = new TlsSessionInitiator(domain, 5222)
-	def Negotiate(input: InputStream, output: OutputStream) {
+	private var msghandlers = Map[Class[_], XmppProtocolMessage => Unit]()
+	private var connectCallback : () => Unit = _
+	def Negotiate(input: InputStream, output: OutputStream, callback : () => Unit) {
+		connectCallback = callback
+		InitiateUnderlyingStream(input, output)
+		state = XmppConnectionState.ConnectionEstablished
+	}
+	private def InitiateUnderlyingStream(input : InputStream, output : OutputStream) {
 		stream = new XmppStream(input, output, streamFactory, HandleMessage)
 		stream.StartReaderThread
 		stream.SendMessage(new StreamInitMessage(domain, List[XmppFeature]()))
 		stream.Flush
-		state = XmppConnectionState.ConnectionEstablished
 	}
 	def SendMessageImmediately(message : WritableXmppMessage) = {
 		stream.SendMessage(message)
@@ -68,6 +73,6 @@ class XmppConnection(domain: String, username: String, password : String, stream
 	}
 	private def CompleteTLSNegotiation(input : InputStream, output : OutputStream) {
 		println("Completed TLS negotiation")
-		Negotiate(input, output)
+		InitiateUnderlyingStream(input, output)
 	}
 }

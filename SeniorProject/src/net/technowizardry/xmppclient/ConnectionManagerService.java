@@ -58,7 +58,7 @@ public class ConnectionManagerService extends Service {
 
 				if(socket.isConnected()) {
 					try {
-						connection.Negotiate(socket.getInputStream(), socket.getOutputStream());
+						connection.Negotiate(socket.getInputStream(), socket.getOutputStream(), null);
 					} catch (IOException e) {
 						e.printStackTrace();
 					}

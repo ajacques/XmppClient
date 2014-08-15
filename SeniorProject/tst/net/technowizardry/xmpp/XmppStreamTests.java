@@ -10,6 +10,7 @@ import java.io.OutputStreamWriter;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 
 import junit.framework.TestCase;
 import net.technowizardry.XMLObjectType;
@@ -72,11 +73,11 @@ public class XmppStreamTests extends TestCase {
 	}
 
 	@Test
-	public void testReceiveMessage() throws IOException, InterruptedException {
+	public void testReceivMessage() throws IOException, InterruptedException {
 		stream.StartReaderThread();
 		fromServer.write("<stream:stream xmlns:stream='foobar' stream:attrib='attrib_value'>");
 		fromServer.flush();
-		messageLatch.acquire();
+		//messageLatch.tryAcquire(5, TimeUnit.SECONDS);
 		assertEquals(XMLObjectType.StartElement(), reader.NodeType());
 		assertEquals("stream", reader.LocalName());
 		assertEquals("foobar", reader.NamespaceURI());
@@ -97,8 +98,9 @@ public class XmppStreamTests extends TestCase {
 		messageLatch.release();
 		try {
 			Thread.sleep(500);
-			messageLatch.acquire();
+			messageLatch.tryAcquire(5, TimeUnit.SECONDS);
 		} catch (InterruptedException e) {
+			fail(e.getMessage());
 			throw new RuntimeException(e);
 		}
 	}

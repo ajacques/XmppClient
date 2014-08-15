@@ -13,6 +13,7 @@ class JavaXMLReader(stream : InputStream) extends XMLReader {
 			case XMLStreamConstants.START_ELEMENT => XMLObjectType.StartElement
 			case XMLStreamConstants.END_ELEMENT => XMLObjectType.EndElement
 			case XMLStreamConstants.CHARACTERS => XMLObjectType.Text
+			case XMLStreamConstants.END_DOCUMENT => XMLObjectType.EndDocument
 		}
 	}
 	def LocalName() = inner.getLocalName()

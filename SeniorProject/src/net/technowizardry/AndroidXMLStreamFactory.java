@@ -10,8 +10,7 @@ import net.technowizardry.XMLWriter;
 public class AndroidXMLStreamFactory implements XMLStreamFactory {
 	@Override
 	public XMLReader CreateReader(InputStream stream) {
-		// TODO Auto-generated method stub
-		return null;
+		return new PullParserXMLReader(stream);
 	}
 
 	@Override

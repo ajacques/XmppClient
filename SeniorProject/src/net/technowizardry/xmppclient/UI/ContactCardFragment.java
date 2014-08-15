@@ -14,6 +14,7 @@ public class ContactCardFragment extends Fragment {
 	private String otherId;
 	private Intent clicked;
 
+	public ContactCardFragment() {} // Android BS
 	public ContactCardFragment (String username, String otherUsername) {
 		id = username;
 		otherId = otherUsername;
