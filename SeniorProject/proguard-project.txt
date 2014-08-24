@@ -12,6 +12,10 @@
 
 -dontwarn scala.**
 
+-printseeds seeds.txt
+-printusage unused.txt
+-printmapping mapping.txt
+
 -dontnote javax.xml.**
 -dontnote org.w3c.dom.**
 -dontnote org.xml.sax.**

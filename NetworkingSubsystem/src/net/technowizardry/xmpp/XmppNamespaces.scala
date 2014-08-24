@@ -7,5 +7,6 @@ object XmppNamespaces {
 	val Sasl = "urn:ietf:params:xml:ns:xmpp-sasl"
 	val Compression = "http://jabber.org/protocol/compress"
 	val CompressionFeature = "http://jabber.org/features/compress"
-	val Bind = "urn:ietf:params:xml:ns:xmpp-bind'"
+	val Bind = "urn:ietf:params:xml:ns:xmpp-bind"
+	val Roster = "jabber:iq:roster"
 }

@@ -73,11 +73,11 @@ public class XmppStreamTests extends TestCase {
 	}
 
 	@Test
-	public void testReceivMessage() throws IOException, InterruptedException {
+	public void testReceiveMessage() throws IOException, InterruptedException {
 		stream.StartReaderThread();
 		fromServer.write("<stream:stream xmlns:stream='foobar' stream:attrib='attrib_value'>");
 		fromServer.flush();
-		//messageLatch.tryAcquire(5, TimeUnit.SECONDS);
+		messageLatch.tryAcquire(5, TimeUnit.SECONDS);
 		assertEquals(XMLObjectType.StartElement(), reader.NodeType());
 		assertEquals("stream", reader.LocalName());
 		assertEquals("foobar", reader.NamespaceURI());

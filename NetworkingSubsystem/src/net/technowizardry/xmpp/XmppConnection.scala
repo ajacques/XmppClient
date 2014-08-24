@@ -4,14 +4,15 @@ import java.io.InputStream
 import java.io.OutputStream
 import net.technowizardry._
 import net.technowizardry.xmpp.messages._
+import net.technowizardry.xmpp.auth.XmppAuthenticator
 
 class XmppConnection(domain: String, username: String, password : String, streamFactory : XMLStreamFactory) {
+	private var msghandlers = Map[Class[_], XmppProtocolMessage => Unit]()
 	private val msgfactory = new XmppMessageFactory
 	private val authenticator = new XmppAuthenticator(this, username, password)
 	private val initiator = new TlsSessionInitiator(domain, 5222)
 	private var stream : XmppStream = _
 	private var state = XmppConnectionState.NotConnected
-	private var msghandlers = Map[Class[_], XmppProtocolMessage => Unit]()
 	private var connectCallback : () => Unit = _
 	def Negotiate(input: InputStream, output: OutputStream, callback : () => Unit) {
 		connectCallback = callback
@@ -21,16 +22,14 @@ class XmppConnection(domain: String, username: String, password : String, stream
 	private def InitiateUnderlyingStream(input : InputStream, output : OutputStream) {
 		stream = new XmppStream(input, output, streamFactory, HandleMessage)
 		stream.StartReaderThread
-		stream.SendMessage(new StreamInitMessage(domain, List[XmppFeature]()))
-		stream.Flush
+		SendMessageImmediately(new StreamInitMessage(domain, List[XmppFeature]()))
 	}
 	def SendMessageImmediately(message : WritableXmppMessage) = {
 		stream.SendMessage(message)
 		stream.Flush()
 	}
 	def Disconnect() {
-		stream.SendMessage(new StreamCloseMessage())
-		stream.Flush()
+		SendMessageImmediately(new StreamCloseMessage())
 		stream.Shutdown
 	}
 	def RegisterMessageCallback(msgtype : Class[_], handler : XmppProtocolMessage => Unit) {
@@ -50,6 +49,7 @@ class XmppConnection(domain: String, username: String, password : String, stream
 					case si : StreamInitMessage => HandleStreamInitMessage(si)
 					case s : StartTlsProceedMessage => NegotiateTLS()
 					case s : SaslSuccessMessage => FinalizeAuthentication()
+					case s : CompressedMessage => NegotiateCompression()
 				}
 			}
 		}
@@ -57,10 +57,11 @@ class XmppConnection(domain: String, username: String, password : String, stream
 	private def HandleStreamInitMessage(message : StreamInitMessage) {
 		message.GetFeatures().foreach(f => println(String.format("Feature: %s:%s", f.GetNamespace(), f.GetName())))
 		if (message.SupportsStartTls) {
-			stream.SendMessage(new StartTlsMessage())
-			stream.Flush
-		} else {
+			SendMessageImmediately(new StartTlsMessage())
+		} else if (message.SupportsFeature("mechanisms", XmppNamespaces.Sasl)) {
 			authenticator.AttemptAuthentication(message.GetMechanisms())
+		} else if (message.SupportsCompression) {
+			SendMessageImmediately(new CompressionInitMessage("zlib"));
 		}
 	}
 	private def NegotiateTLS() {
@@ -68,8 +69,18 @@ class XmppConnection(domain: String, username: String, password : String, stream
 
 		initiator.Negotiate(stream.GetInnerInputStream(), stream.GetInnerOutputStream(), CompleteTLSNegotiation)
 	}
+	private def NegotiateCompression() {
+		stream.Shutdown
+
+		InitiateUnderlyingStream(new ZlibDecompressStream(stream.GetInnerInputStream()), new ZlibCompressStream(stream.GetInnerOutputStream()))
+	}
 	private def FinalizeAuthentication() {
 		state = XmppConnectionState.Authenticated
+		if (connectCallback != null) {
+			connectCallback()
+		}
+		stream.Shutdown()
+		InitiateUnderlyingStream(stream.GetInnerInputStream(), stream.GetInnerOutputStream())
 	}
 	private def CompleteTLSNegotiation(input : InputStream, output : OutputStream) {
 		println("Completed TLS negotiation")

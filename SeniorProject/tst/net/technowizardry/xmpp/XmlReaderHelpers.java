@@ -10,6 +10,8 @@ public class XmlReaderHelpers {
 	private static final XMLStreamFactory streamFactory = XMLStreamFactoryFactory.newInstance();
 
 	public static XMLReader readerFromString(String xml) {
-		return streamFactory.CreateReader(new ByteArrayInputStream(xml.getBytes()));
+		XMLReader reader = streamFactory.CreateReader(new ByteArrayInputStream(xml.getBytes()));
+		reader.Next();
+		return reader;
 	}
 }

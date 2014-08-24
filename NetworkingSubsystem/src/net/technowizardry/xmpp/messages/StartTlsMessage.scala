@@ -11,9 +11,3 @@ class StartTlsMessage extends XmppProtocolMessage with WritableXmppMessage {
 }
 
 class StartTlsProceedMessage extends XmppProtocolMessage {}
-
-object TlsMessageParser {
-	def UnpackProceed(reader : XMLReader) : StartTlsProceedMessage = {
-		return new StartTlsProceedMessage()
-	}
-}

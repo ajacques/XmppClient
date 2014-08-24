@@ -19,6 +19,7 @@ public class XmppPackets {
 			"<foobar xmlns='http://technowizardry.net/xmpp/madeup'>"
 			+ "<boojum>Seven</boojum>"
 			+ "</foobar>";
+	public static final String SASL_SUCCESS = "<success xmlns='urn:ietf:params:xml:ns:xmpp-sasl' />";
 	public static String buildMechanismList(String... mechanisms) {
 		StringBuilder builder = new StringBuilder();
 		builder.append("<mechanisms xmlns='urn:ietf:params:xml:ns:xmpp-sasl'>");
@@ -39,6 +40,15 @@ public class XmppPackets {
 		}
 		builder.append("</features>");
 		builder.append("</stream:stream>");
+		return builder.toString();
+	}
+	public static String buildIqMessage(String type, String content) {
+		StringBuilder builder = new StringBuilder();
+		builder.append("<iq xmlns='jabber:client' id='1' type='");
+		builder.append(type);
+		builder.append("'>");
+		builder.append(content);
+		builder.append("</iq>");
 		return builder.toString();
 	}
 }

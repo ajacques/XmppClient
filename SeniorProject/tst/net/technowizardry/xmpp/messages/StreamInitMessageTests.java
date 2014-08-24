@@ -67,7 +67,6 @@ public class StreamInitMessageTests extends TestCase {
 
 	private StreamInitMessage unpackMessage(String xml) {
 		XMLReader reader = XmlReaderHelpers.readerFromString(xml);
-		reader.Next();
 		XmppProtocolMessage message = StreamInitMessageParser.Unpack(reader);
 		assertNotNull(message);
 		assertTrue(message instanceof StreamInitMessage);

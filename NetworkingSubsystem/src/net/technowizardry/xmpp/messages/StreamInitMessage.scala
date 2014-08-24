@@ -13,7 +13,7 @@ class StreamInitMessage(server: String, features : List[XmppFeature]) extends Xm
 		writer.WriteText("")
 	}
 	def SupportsStartTls() = SupportsFeature("starttls", XmppNamespaces.Tls)
-	def SupportsCompression() = SupportsFeature("compress", XmppNamespaces.Compression)
+	def SupportsCompression() = SupportsFeature("compression", XmppNamespaces.CompressionFeature)
 	def SupportsFeature(name : String, namespace : String) = features.exists(p => p.GetNamespace() == namespace && p.GetName() == name)
 	def GetFeature(name : String, ns : String) = features.find(p => p.GetNamespace() == ns && p.GetName() == name).orNull
 	def GetMechanisms() = {

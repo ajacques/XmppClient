@@ -29,7 +29,6 @@ public class StreamInitMessageTests extends TestCase {
 	public void testDeserialize() {
 		String packet = XmppPackets.buildStreamInit(XmppPackets.STREAM_INIT_STARTTLS_REQUIRED);
 		XMLReader reader = XmlReaderHelpers.readerFromString(packet);
-		reader.Next();
 		StreamInitMessage message = (StreamInitMessage)StreamInitMessageParser.Unpack(reader);
 		assertNotNull(message);
 		List<XmppFeature> features = message.GetFeatures();

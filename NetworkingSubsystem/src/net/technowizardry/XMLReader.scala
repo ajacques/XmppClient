@@ -9,11 +9,11 @@ abstract class XMLReader {
 	def GetAttributeValue(ns : String, key : String) : String
 	def ElementText() : String
 	def ReadUntilEndElement(ns : String, name : String) = {
-		while (HasNext() && !IsCorrectEndElement(ns, name)) {
+		while (HasNext() && !IsExpectedEndElement(ns, name)) {
 			Next()
 		}
 	}
-	private def IsCorrectEndElement(ns : String, name : String) : Boolean = {
+	def IsExpectedEndElement(ns : String, name : String): Boolean = {
 		if (NodeType() == XMLObjectType.EndElement) {
 			return LocalName() == name && NamespaceURI() == ns
 		} else {

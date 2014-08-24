@@ -1,6 +1,6 @@
 package net.technowizardry.xmpp.messages
 
-import net.technowizardry.{XMLWriter, XMLReader}
+import net.technowizardry.{Base64, XMLWriter, XMLReader}
 import net.technowizardry.xmpp._
 
 abstract class SaslAuthMessage extends XmppProtocolMessage with WritableXmppMessage {
@@ -14,7 +14,25 @@ abstract class SaslAuthMessage extends XmppProtocolMessage with WritableXmppMess
 	protected def GetMechanismName() : String
 }
 
-class SaslChallengeMessage extends XmppProtocolMessage {}
+class SaslChallengeMessage(message : String) extends XmppProtocolMessage {
+	val b64decode = Base64.Decode(message)
+	val dict = b64decode
+		.split(',')
+		.map(_.split('='))
+		.map { case Array(k, v) => (k, v)}
+		.toMap
+	def Message = b64decode
+	def GetProperty(prop : String) = dict.get(prop).orNull
+}
+
+class SaslResponseMessage(message : String) extends XmppProtocolMessage with WritableXmppMessage {
+	def WriteMessage(writer : XMLWriter) {
+		writer.WriteStartElement("response", XmppNamespaces.Sasl)
+		writer.WriteText(Base64.Encode(message))
+		writer.WriteEndElement()
+	}
+	def Message = message
+}
 
 class SaslFailureMessage(message : String) extends XmppProtocolMessage {}
 
@@ -22,9 +40,12 @@ class SaslSuccessMessage extends XmppProtocolMessage {}
 
 object SaslParser {
 	def UnpackChallenge(reader : XMLReader) : XmppProtocolMessage = {
-		return new SaslChallengeMessage()
+		val string = reader.ElementText
+		//reader.Next()
+		return new SaslChallengeMessage(string)
 	}
 	def UnpackSuccess(reader : XMLReader) : XmppProtocolMessage = {
+		reader.Next();
 		return new SaslSuccessMessage()
 	}
 	def UnpackFailure(reader : XMLReader) : XmppProtocolMessage = {
