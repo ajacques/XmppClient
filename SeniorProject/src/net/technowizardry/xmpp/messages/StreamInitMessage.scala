@@ -8,8 +8,8 @@ class StreamInitMessage(server: String, features : List[XmppFeature]) extends Xm
 		writer.WriteStartElement("stream", "stream", XmppNamespaces.Streams)
 		writer.WriteNamespace("stream", XmppNamespaces.Streams)
 		writer.WriteDefaultNamespace(XmppNamespaces.Jabber)
-		writer.WriteAttribute("version", "1.0", XmppNamespaces.Jabber)
-		writer.WriteAttribute("to", server, XmppNamespaces.Jabber)
+		writer.WriteAttribute("version", "1.0", null)
+		writer.WriteAttribute("to", server, null)
 		writer.WriteText("")
 	}
 	def SupportsStartTls() = SupportsFeature("starttls", XmppNamespaces.Tls)

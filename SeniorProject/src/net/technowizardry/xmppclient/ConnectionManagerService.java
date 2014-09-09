@@ -3,7 +3,12 @@ package net.technowizardry.xmppclient;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.util.concurrent.Semaphore;
 
+import scala.Function0;
+import scala.runtime.AbstractFunction0;
+import scala.runtime.BoxedUnit;
+import net.technowizardry.XMLStreamFactoryFactory;
 import net.technowizardry.xmppclient.networking.ExternalLibraryBasedDnsResolver;
 import net.technowizardry.xmppclient.networking.ServiceEndpointResolver;
 import net.technowizardry.xmpp.XmppConnection;
@@ -14,11 +19,13 @@ import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.IBinder;
+import android.util.Log;
 
 public class ConnectionManagerService extends Service {
 	private Intent broadcast;
 	private String domain;
 	private String localName;
+	private String password;
 	private XmppConnection connection;
 	private XmppSocketFactory factory;
 	public static final String BROADCAST_ACTION = "net.technowizardry.xmppclient.BROADCAST";
@@ -32,6 +39,7 @@ public class ConnectionManagerService extends Service {
 		super.onStartCommand(intent, flags, startId);
 		domain = intent.getStringExtra("domainName");
 		localName = intent.getStringExtra("localName");
+		password = intent.getStringExtra("password");
 
 		ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
 		NetworkInfo netInfo = cm.getActiveNetworkInfo();
@@ -45,29 +53,41 @@ public class ConnectionManagerService extends Service {
 	private void XmppConnect() {
 		Thread t = new Thread(){
 			public void run() {
-				connection = new XmppConnection(domain, localName, null, null);
+				connection = new XmppConnection(domain, localName, password, XMLStreamFactoryFactory.newInstance());
 				factory = new XmppSocketFactory(new ServiceEndpointResolver(new ExternalLibraryBasedDnsResolver()));
 				Socket socket = null;
 				try {
 					socket = factory.newConnection(domain);
 				} catch (UnknownHostException e) {
 					e.printStackTrace();
+					return;
 				} catch (IOException e) {
 					e.printStackTrace();
+					return;
 				}
 
 				if(socket.isConnected()) {
 					try {
-						connection.Negotiate(socket.getInputStream(), socket.getOutputStream(), null);
+						Function0<BoxedUnit> loginCallback = new AbstractFunction0<BoxedUnit>() {
+							@Override
+							public BoxedUnit apply() {
+								connectionCompleted();
+								return null;
+							}
+						};
+						connection.Negotiate(socket, socket.getInputStream(), socket.getOutputStream(), loginCallback);
 					} catch (IOException e) {
 						e.printStackTrace();
+						return;
 					}
-
 				}
 			}
 		};
 		t.start();
 
+	}
+
+	private void connectionCompleted() {
 		broadcast.setAction(BROADCAST_ACTION);
 		broadcast.putExtra("connected", "Connected");
 		this.sendBroadcast(broadcast);

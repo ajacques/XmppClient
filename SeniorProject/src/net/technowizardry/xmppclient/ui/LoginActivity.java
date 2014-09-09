@@ -25,8 +25,10 @@ public class LoginActivity extends Activity {
 	private String username;
 	private String domainName;
 	private String localName;
+	private String password;
 	private TextView invalid;
 	private EditText loginText;
+	private EditText passText;
 	private Button signInButton;
 
 	@Override
@@ -35,10 +37,12 @@ public class LoginActivity extends Activity {
 		setContentView(R.layout.login_screen);
 		invalid = (TextView)findViewById(R.id.invalidUsernameTextView);
 		loginText = (EditText)findViewById(R.id.loginUsername);
+		passText = (EditText)findViewById(R.id.loginPassword);
 		signInButton = (Button)findViewById(R.id.signInButton);
 		username = null;
 		domainName = null;
 		localName = null;
+		password = null;
 		signInButton.setEnabled(true);
 	}
 
@@ -88,7 +92,8 @@ public class LoginActivity extends Activity {
 			username = loginText.getText().toString().trim();
 			int index = username.indexOf("@");
 			domainName = (index == -1) ? "" : username.substring(index+1, username.length());
-			if (domainName == "") {
+			password = passText.getText().toString();
+			if (domainName == "" || password == "") {
 				invalid.setText("Invalid Username or Password");
 				signInButton.setEnabled(true);
 			}
@@ -98,7 +103,6 @@ public class LoginActivity extends Activity {
 				performSRVCheck SRVCheck = new performSRVCheck(getApplicationContext());
 				SRVCheck.execute(domainName);
 			}
-			
 			break;
 		case R.id.createAccount:
 			startActivity(new Intent(getApplicationContext(), CreateAccountActivity.class));
@@ -111,7 +115,9 @@ public class LoginActivity extends Activity {
 		Intent nextIntent = new Intent(getApplicationContext(), HomeActivity.class);
 		nextIntent.putExtra("domainName", domainName);
 		nextIntent.putExtra("localName", localName);
+		nextIntent.putExtra("password", password);
 		startActivity(nextIntent);
+		overridePendingTransition(R.animator.fade_in, R.animator.fade_out);
 		finish();
 	}
 

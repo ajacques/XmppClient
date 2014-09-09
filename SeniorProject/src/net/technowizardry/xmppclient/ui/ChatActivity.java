@@ -2,15 +2,32 @@ package net.technowizardry.xmppclient.ui;
 
 import net.technowizardry.xmppclient.R;
 import android.app.Activity;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 
 public class ChatActivity extends Activity {
+	private FragmentManager fragmentManager;
+	private FragmentTransaction fragmentTransaction;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_screen);
+
+		loadMessages();
+	}
+
+	private void loadMessages() {
+		fragmentManager = getFragmentManager();
+		fragmentTransaction = fragmentManager.beginTransaction();
+		MessageFragment fragment = new MessageFragment("Cody", "Hey whats uppp", true);
+		fragmentTransaction.add(R.id.chatMainLL , fragment, "one");
+		fragmentTransaction.commit();
+		fragment = new MessageFragment("Adam", "nothing, you are the most important person ever to me", false);
+		fragmentTransaction.add(R.id.chatMainLL , fragment, "one");
+		fragmentTransaction.commit();
 	}
 
 	@Override

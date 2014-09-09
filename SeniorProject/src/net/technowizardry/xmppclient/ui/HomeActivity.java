@@ -19,6 +19,7 @@ public class HomeActivity extends Activity {
 	private String connectionReturnData;
 	private String localName;
 	private String domainName;
+	private String password;
 	private FragmentManager fragmentManager;
 	private FragmentTransaction fragmentTransaction;
 
@@ -28,10 +29,14 @@ public class HomeActivity extends Activity {
 		connectionReturnData = null;
 		localName = getIntent().getStringExtra("localName");
 		domainName = getIntent().getStringExtra("domainName");
+		password = getIntent().getStringExtra("password");
 
 		startConnectivityManager();
-		setContentView(R.layout.home_screen);
+		setContentView(R.layout.login_loading);
+	}
 
+	private void loadHomeScreen() {
+		setContentView(R.layout.home_screen);
 		loadConversations();
 	}
 
@@ -47,6 +52,7 @@ public class HomeActivity extends Activity {
 		connectionManagerIntent = new Intent(getApplicationContext(), ConnectionManagerService.class);
 		connectionManagerIntent.putExtra("domainName", domainName);
 		connectionManagerIntent.putExtra("localName", localName);
+		connectionManagerIntent.putExtra("password", password);
 		startService(connectionManagerIntent);
 	}
 
@@ -54,7 +60,8 @@ public class HomeActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			connectionReturnData = intent.getStringExtra("connected");
-			Log.d("return DATA", connectionReturnData.toString());
+			loadHomeScreen();
+			Log.d("LOG", connectionReturnData);
 		}
 	};
 

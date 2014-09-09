@@ -6,7 +6,7 @@ import net.technowizardry.xmpp._
 abstract class SaslAuthMessage extends XmppProtocolMessage with WritableXmppMessage {
 	def WriteMessage(writer : XMLWriter) {
 		writer.WriteStartElement("auth", XmppNamespaces.Sasl)
-		writer.WriteAttribute("mechanism", GetMechanismName(), XmppNamespaces.Sasl)
+		writer.WriteAttribute("mechanism", GetMechanismName(), null)
 		WriteAuthBody(writer)
 		writer.WriteEndElement()
 	}
@@ -40,8 +40,9 @@ class SaslSuccessMessage extends XmppProtocolMessage {}
 
 object SaslParser {
 	def UnpackChallenge(reader : XMLReader) : XmppProtocolMessage = {
+		reader.Next()
 		val string = reader.ElementText
-		//reader.Next()
+		reader.Next()
 		return new SaslChallengeMessage(string)
 	}
 	def UnpackSuccess(reader : XMLReader) : XmppProtocolMessage = {

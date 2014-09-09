@@ -1,13 +1,14 @@
 package net.technowizardry
 
+import java.net.Socket
 import java.io.{InputStream, OutputStream}
 import java.security.SecureRandom
 import javax.net.ssl.{SSLSocket, SSLContext, TrustManager, SSLSocketFactory, HandshakeCompletedListener, HandshakeCompletedEvent}
 
-class TlsSessionInitiator(domainName : String, port : Integer) {
+class TlsSessionInitiator(domainName : String, port : Integer, socket : Socket) {
 	val sslFactory = GetSSLSocketFactory()
 	def Negotiate(input: InputStream, output: OutputStream, completeCallback : (InputStream, OutputStream) => Unit) {
-		var sslSocket = sslFactory.createSocket(new StreamWrapperSocket(input, output), domainName, port, false) match {
+		var sslSocket = sslFactory.createSocket(socket, domainName, port, false) match {
 			case s : SSLSocket => s
 		}
 		var thisconn = this

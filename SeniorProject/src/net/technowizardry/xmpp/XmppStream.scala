@@ -24,11 +24,7 @@ class XmppStream(inputStream : InputStream, outputStream : OutputStream, streamF
 				val reader = streamFactory.CreateReader(inputStream)
 				println("Entering XMPP message read loop")
 				while (runReaderThread && reader.HasNext()) {
-					try {
-						reader.Next()
-					} catch {
-						case e : XMLStreamException => println(reader.toString())
-					}
+					reader.Next()
 					println("Got something: " + reader.NamespaceURI())
 					messageReader(reader)
 				}

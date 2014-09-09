@@ -1,5 +1,6 @@
 package net.technowizardry.xmpp
 
+import java.net.Socket
 import java.io.InputStream
 import java.io.OutputStream
 import net.technowizardry._
@@ -10,13 +11,15 @@ class XmppConnection(domain: String, username: String, password : String, stream
 	private var msghandlers = Map[Class[_], XmppProtocolMessage => Unit]()
 	private val msgfactory = new XmppMessageFactory
 	private val authenticator = new XmppAuthenticator(this, username, password)
-	private val initiator = new TlsSessionInitiator(domain, 5222)
+	private var initiator : TlsSessionInitiator = _
 	private var stream : XmppStream = _
 	private var state = XmppConnectionState.NotConnected
 	private var connectCallback : () => Unit = _
-	def Negotiate(input: InputStream, output: OutputStream, callback : () => Unit) {
+	private var socket : Socket = _
+	def Negotiate(socket : Socket, input: InputStream, output: OutputStream, callback : () => Unit) {
 		connectCallback = callback
 		InitiateUnderlyingStream(input, output)
+		initiator = new TlsSessionInitiator(domain, 5222, socket)
 		state = XmppConnectionState.ConnectionEstablished
 	}
 	private def InitiateUnderlyingStream(input : InputStream, output : OutputStream) {
@@ -60,7 +63,7 @@ class XmppConnection(domain: String, username: String, password : String, stream
 			SendMessageImmediately(new StartTlsMessage())
 		} else if (message.SupportsFeature("mechanisms", XmppNamespaces.Sasl)) {
 			authenticator.AttemptAuthentication(message.GetMechanisms())
-		} else if (message.SupportsCompression) {
+		} else if (false && message.SupportsCompression) {
 			SendMessageImmediately(new CompressionInitMessage("zlib"));
 		}
 	}

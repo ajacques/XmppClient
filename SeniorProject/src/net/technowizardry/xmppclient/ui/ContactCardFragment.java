@@ -24,9 +24,9 @@ public class ContactCardFragment extends Fragment {
 
 		View v =  inflater.inflate(R.layout.contact_fragment, container, false);
 
-		((TextView) v.findViewById(R.id.chatConv)).setText("Adam is da BESTESET! <3");
+		((TextView) v.findViewById(R.id.conversationMessage)).setText("Adam is da BESTESET! <3");
 		((TextView) v.findViewById(R.id.chatUsername)).setText("Username");
-		((TextView) v.findViewById(R.id.chatDate)).setText("date");
+		((TextView) v.findViewById(R.id.recentDate)).setText("date");
 
 		v.setOnClickListener(new View.OnClickListener() {
 			@Override
