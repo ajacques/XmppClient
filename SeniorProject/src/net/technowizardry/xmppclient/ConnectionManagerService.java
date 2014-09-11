@@ -6,12 +6,15 @@ import java.net.UnknownHostException;
 import java.util.concurrent.Semaphore;
 
 import scala.Function0;
+import scala.Function1;
 import scala.runtime.AbstractFunction0;
+import scala.runtime.AbstractFunction1;
 import scala.runtime.BoxedUnit;
 import net.technowizardry.XMLStreamFactoryFactory;
 import net.technowizardry.xmppclient.networking.ExternalLibraryBasedDnsResolver;
 import net.technowizardry.xmppclient.networking.ServiceEndpointResolver;
 import net.technowizardry.xmpp.XmppConnection;
+import net.technowizardry.xmpp.XmppSession;
 import net.technowizardry.xmppclient.networking.XmppSocketFactory;
 import android.app.Service;
 import android.content.Context;
@@ -28,6 +31,7 @@ public class ConnectionManagerService extends Service {
 	private String password;
 	private XmppConnection connection;
 	private XmppSocketFactory factory;
+	private XmppSession session;
 	public static final String BROADCAST_ACTION = "net.technowizardry.xmppclient.BROADCAST";
 
 	public ConnectionManagerService() {
@@ -68,9 +72,9 @@ public class ConnectionManagerService extends Service {
 
 				if(socket.isConnected()) {
 					try {
-						Function0<BoxedUnit> loginCallback = new AbstractFunction0<BoxedUnit>() {
+						Function1<Object, BoxedUnit> loginCallback = new AbstractFunction1<Object, BoxedUnit>() {
 							@Override
-							public BoxedUnit apply() {
+							public BoxedUnit apply(Object success) {
 								connectionCompleted();
 								return null;
 							}
@@ -91,6 +95,8 @@ public class ConnectionManagerService extends Service {
 		broadcast.setAction(BROADCAST_ACTION);
 		broadcast.putExtra("connected", "Connected");
 		this.sendBroadcast(broadcast);
+		session = new XmppSession(connection);
+		session.BindToResource("android-phone");
 	}
 
 	@Override
