@@ -2,6 +2,7 @@ package net.technowizardry.xmpp;
 
 import java.net.UnknownHostException;
 import java.util.List;
+import java.util.Set;
 
 import net.technowizardry.xmppclient.networking.ExternalLibraryBasedDnsResolver;
 import net.technowizardry.xmppclient.networking.ServiceRecord;
@@ -25,10 +26,10 @@ public class ExternalLibraryBasedDnsResolverTests extends TestCase {
 
 	@Test
 	public void testQuicklookup() throws TextParseException, UnknownHostException {
-		List<ServiceRecord> records = resolver.performSRVLookup(TEST_DOMAIN);
+		Set<ServiceRecord> records = resolver.performSRVLookup(TEST_DOMAIN);
 		assertNotNull(records);
 		assertEquals(1, records.size());
-		ServiceRecord record = records.get(0);
+		ServiceRecord record = records.iterator().next();
 		assertEquals(TEST_SERVER, record.getAddress());
 		assertEquals(5222, record.getPort());
 		assertEquals(10, record.getWeight());

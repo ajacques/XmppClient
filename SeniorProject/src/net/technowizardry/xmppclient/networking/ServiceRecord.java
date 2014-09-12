@@ -1,6 +1,6 @@
 package net.technowizardry.xmppclient.networking;
 
-public class ServiceRecord {
+public class ServiceRecord implements Comparable<ServiceRecord> {
 	private final String address;
 	private final int port;
 	private final int weight;
@@ -32,5 +32,10 @@ public class ServiceRecord {
 
 	public int getPriority() {
 		return priority;
+	}
+
+	@Override
+	public int compareTo(ServiceRecord arg0) {
+		return this.getPriority() - arg0.getPriority();
 	}
 }

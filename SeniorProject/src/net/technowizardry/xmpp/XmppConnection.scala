@@ -65,7 +65,7 @@ class XmppConnection(domain: String, username: String, password : String, stream
 			SendMessageImmediately(new StartTlsMessage())
 		} else if (message.SupportsFeature("mechanisms", XmppNamespaces.Sasl)) {
 			authenticator.AttemptAuthentication(message.GetMechanisms())
-		} else if (false && message.SupportsCompression) {
+		} else if (message.SupportsCompression) {
 			SendMessageImmediately(new CompressionInitMessage("zlib"));
 		} else {
 			if (connectCallback != null) {

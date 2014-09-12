@@ -11,7 +11,6 @@ class TlsSessionInitiator(domainName : String, port : Integer, socket : Socket) 
 		var sslSocket = sslFactory.createSocket(socket, domainName, port, false) match {
 			case s : SSLSocket => s
 		}
-		var thisconn = this
 		sslSocket.addHandshakeCompletedListener(new HandshakeCompletedListener {
 			def handshakeCompleted(event : HandshakeCompletedEvent) = {
 				println(String.format("TLS Negotiated - Cipher: %s", event.getCipherSuite()))

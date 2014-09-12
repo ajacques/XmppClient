@@ -8,10 +8,10 @@ import scala.util.Random
 class IqCorrelator {
 	var id = new Random().nextLong()
 	var inflight_iqs = Map[String, IqResponseMessage => Unit]()
-	def RegisterRequest(request : IqRequestBody, callback : IqResponseMessage => Unit) : IqRequestMessage = {
+	def RegisterRequest(request : IqRequestBody, mtype : String, callback : IqResponseMessage => Unit) : IqRequestMessage = {
 		val id = EncodeIdentifier(GenerateNextIdentifier())
 		inflight_iqs += (id -> callback)
-		new IqRequestMessage(id, request)
+		new IqRequestMessage(id, mtype, request)
 	}
 	def FetchCallback(response : IqResponseMessage) : IqResponseMessage => Unit = {
 		val callback = inflight_iqs(response.MessageId)

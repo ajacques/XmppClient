@@ -23,6 +23,6 @@ class JavaBase64Thing extends Base64er {
 
 class AndroidBase64Thing extends Base64er {
 	def Encode(input : String) = Encode(input.getBytes())
-	def Encode(input : Array[Byte]) = android.util.Base64.encodeToString(input, 0)
+	def Encode(input : Array[Byte]) = android.util.Base64.encodeToString(input, android.util.Base64.NO_WRAP)
 	def Decode(input : String) = new String(android.util.Base64.decode(input, 0))
 }
