@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
 
     <string name="app_name">XmppClient</string>
     <string name="hello_world">Hello world!</string>
@@ -12,5 +12,7 @@
     <string name="UITestConv">Conversation</string>
     <string name="UITestDate">Date</string>
     <string name="createAccount">Create Account</string>
+    <string name="actionBarNewConversation">New Conversation</string>
+    <string name="sendMessageHint">Send Message</string>
 
 </resources>

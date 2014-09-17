@@ -27,14 +27,14 @@ public class MessageFragment extends Fragment {
 		if (isLocalUser) {
 			v =  inflater.inflate(R.layout.localuser_message_fragment, container, false);
 
-			((TextView) v.findViewById(R.id.chatMessage)).setText("Adam is da BESTESET! <3");
+			((TextView) v.findViewById(R.id.chatMessage)).setText(message);
 			((TextView) v.findViewById(R.id.messageDate)).setText("date");
 		}
 		else {
 			v =  inflater.inflate(R.layout.otheruser_message_fragment, container, false);
 
-			((TextView) v.findViewById(R.id.chatMessage)).setText("Adam is da BESTESET! <3");
-			((TextView) v.findViewById(R.id.messageDate)).setText("date");
+			((TextView) v.findViewById(R.id.otherChatMessage)).setText(message);
+			((TextView) v.findViewById(R.id.otherMessageDate)).setText("date");
 		}
 
 		return v;

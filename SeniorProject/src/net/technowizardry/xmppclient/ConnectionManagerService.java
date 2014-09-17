@@ -25,7 +25,6 @@ import android.os.IBinder;
 import android.util.Log;
 
 public class ConnectionManagerService extends Service {
-	private Intent broadcast;
 	private String domain;
 	private String localName;
 	private String password;
@@ -35,7 +34,7 @@ public class ConnectionManagerService extends Service {
 	public static final String BROADCAST_ACTION = "net.technowizardry.xmppclient.BROADCAST";
 
 	public ConnectionManagerService() {
-		broadcast = new Intent();
+		
 	}
 
 	@Override
@@ -63,10 +62,10 @@ public class ConnectionManagerService extends Service {
 				try {
 					socket = factory.newConnection(domain);
 				} catch (UnknownHostException e) {
-					e.printStackTrace();
+					connectionFailed();
 					return;
 				} catch (IOException e) {
-					e.printStackTrace();
+					connectionFailed();
 					return;
 				}
 
@@ -75,7 +74,12 @@ public class ConnectionManagerService extends Service {
 						Function1<Object, BoxedUnit> loginCallback = new AbstractFunction1<Object, BoxedUnit>() {
 							@Override
 							public BoxedUnit apply(Object success) {
-								connectionCompleted();
+								if ((Boolean) success) {
+									connectionCompleted();
+								}
+								else {
+									connectionFailed();
+								}
 								return null;
 							}
 						};
@@ -92,11 +96,19 @@ public class ConnectionManagerService extends Service {
 	}
 
 	private void connectionCompleted() {
+		Intent broadcast = new Intent();
 		broadcast.setAction(BROADCAST_ACTION);
-		broadcast.putExtra("connected", "Connected");
+		broadcast.putExtra("connection", "Connected");
 		this.sendBroadcast(broadcast);
 		session = new XmppSession(connection);
 		session.BindToResource("android-phone");
+	}
+
+	private void connectionFailed() {
+		Intent broadcast = new Intent();
+		broadcast.setAction(BROADCAST_ACTION);
+		broadcast.putExtra("connection", "Failed");
+		this.sendBroadcast(broadcast);
 	}
 
 	@Override

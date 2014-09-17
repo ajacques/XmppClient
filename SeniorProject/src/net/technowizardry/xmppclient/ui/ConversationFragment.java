@@ -9,24 +9,27 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
-public class ContactCardFragment extends Fragment {
+public class ConversationFragment extends Fragment {
 	private String id;
 	private String otherId;
+	private String message;
+	private String date;
 	private Intent clicked;
 
-	public ContactCardFragment() {} // Android BS
-	public ContactCardFragment (String username, String otherUsername) {
-		id = username;
+	public ConversationFragment (String localUsername, String otherUsername, String message, String date) {
+		id = localUsername;
 		otherId = otherUsername;
+		this.message = message;
+		this.date = date;
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
 
-		View v =  inflater.inflate(R.layout.contact_fragment, container, false);
+		View v =  inflater.inflate(R.layout.conversation_fragment, container, false);
 
-		((TextView) v.findViewById(R.id.conversationMessage)).setText("Adam is da BESTESET! <3");
-		((TextView) v.findViewById(R.id.chatUsername)).setText("Username");
-		((TextView) v.findViewById(R.id.chatRecentDate)).setText("date");
+		((TextView) v.findViewById(R.id.conversationMessage)).setText(message);
+		((TextView) v.findViewById(R.id.chatUsername)).setText(id);
+		((TextView) v.findViewById(R.id.chatRecentDate)).setText(date);
 
 		v.setOnClickListener(new View.OnClickListener() {
 			@Override

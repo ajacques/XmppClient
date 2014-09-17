@@ -9,8 +9,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class ChatActivity extends Activity {
-	private FragmentManager fragmentManager;
-	private FragmentTransaction fragmentTransaction;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -20,13 +18,39 @@ public class ChatActivity extends Activity {
 	}
 
 	private void loadMessages() {
+		FragmentManager fragmentManager;
+		FragmentTransaction fragmentTransaction;
 		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
 		MessageFragment fragment = new MessageFragment("Cody", "Hey whats uppp", true);
-		fragmentTransaction.add(R.id.chatMainLL , fragment, "one");
-		fragmentTransaction.commit();
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
 		fragment = new MessageFragment("Adam", "nothing, you are the most important person ever to me", false);
-		fragmentTransaction.add(R.id.chatMainLL , fragment, "one");
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+
+		fragment = new MessageFragment("Cody", "How nice of you to say that <3", true);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "Java Sucks!", false);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Cody", "nothing is worse that doing java with eclipse", true);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", true);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", true);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", true);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", true);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
+		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
 		fragmentTransaction.commit();
 	}
 
@@ -34,6 +58,7 @@ public class ChatActivity extends Activity {
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.main, menu);
+		//getActionBar().setDisplayHomeAsUpEnabled(true); //puts down the back button but doesn't send it back. look into this later
 		return true;
 	}
 
