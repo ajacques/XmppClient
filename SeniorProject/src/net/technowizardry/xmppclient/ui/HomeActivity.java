@@ -109,10 +109,10 @@ public class HomeActivity extends Activity {
 		@Override
 		public void onReceive(Context context, Intent intent) {
 			connectionReturnData = intent.getStringExtra("connection");
-			if(connectionReturnData == "Connected") {
+			if(connectionReturnData.equals("Connected")) {
 				loadHomeScreen();
 			}
-			else if(connectionReturnData == "Failed") {
+			else if(connectionReturnData.equals("Failed")) {
 				connectionFailed();
 			}
 			Log.d("LOG", connectionReturnData);
