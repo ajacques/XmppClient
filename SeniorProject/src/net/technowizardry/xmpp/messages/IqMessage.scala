@@ -1,13 +1,10 @@
 package net.technowizardry.xmpp.messages
 
 import net.technowizardry.{XMLReader,XMLWriter}
-import net.technowizardry.xmpp.XmppContact
-import net.technowizardry.xmpp.XmppNamespaces
+import net.technowizardry.xmpp.{Jid,XmppContact,XmppNamespaces}
 import net.technowizardry.XMLObjectType
 
-abstract class IqMessage extends XmppProtocolMessage {
-	
-}
+abstract class IqMessage extends XmppProtocolMessage {}
 
 class IqRequestMessage(id : String, mtype : String, body : IqRequestBody) extends IqMessage with WritableXmppMessage {
 	def WriteMessage(writer : XMLWriter) {
@@ -62,7 +59,7 @@ object IqParser {
 			if (reader.NodeType() == XMLObjectType.StartElement && reader.LocalName() == "item") {
 				val name = reader.GetAttributeValue(null, "name")
 				val jid = reader.GetAttributeValue(null, "jid")
-				contacts ::= new XmppContact(jid, name)
+				contacts ::= new XmppContact(Jid.FromString(jid), name)
 			}
 			reader.Next()
 		}

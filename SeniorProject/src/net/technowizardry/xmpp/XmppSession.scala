@@ -15,6 +15,9 @@ class XmppSession(connection : XmppConnection) {
 	def FetchRoster(callback : (List[XmppContact]) => Unit) {
 		SendIqRequest(new IqQueryBody(XmppNamespaces.Roster), "get", HandleRosterResponse(callback))
 	}
+	def SendMessageTo(jid : Jid, message : String) {
+		connection.SendMessageImmediately(new ChatMessage(jid, message))
+	}
 	private def HandleIqMessage(message : XmppProtocolMessage) {
 		message match {
 			case x : IqResponseMessage => {
