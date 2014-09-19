@@ -45,10 +45,6 @@ object SaslParser {
 		reader.Next()
 		return new SaslChallengeMessage(string)
 	}
-	def UnpackSuccess(reader : XMLReader) : XmppProtocolMessage = {
-		reader.Next();
-		return new SaslSuccessMessage()
-	}
 	def UnpackFailure(reader : XMLReader) : XmppProtocolMessage = {
 		reader.Next()
 		val message = reader.ElementText()

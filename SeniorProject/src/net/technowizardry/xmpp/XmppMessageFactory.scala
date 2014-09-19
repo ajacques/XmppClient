@@ -18,9 +18,10 @@ class XmppMessageFactory {
 	parsers += (GetKey(XmppNamespaces.Tls, "proceed") -> SingleElementParser.Unpack(new StartTlsProceedMessage()) _)
 	parsers += (GetKey(XmppNamespaces.Sasl, "challenge") -> SaslParser.UnpackChallenge)
 	parsers += (GetKey(XmppNamespaces.Sasl, "failure") -> SaslParser.UnpackFailure)
-	parsers += (GetKey(XmppNamespaces.Sasl, "success") -> SaslParser.UnpackSuccess)
+	parsers += (GetKey(XmppNamespaces.Sasl, "success") -> SingleElementParser.Unpack(new SaslSuccessMessage()) _)
 	parsers += (GetKey(XmppNamespaces.Jabber, "iq") -> IqParser.Unpack)
 	parsers += (GetKey(XmppNamespaces.Compression, "compressed") -> SingleElementParser.Unpack(new CompressedMessage()) _)
+	parsers += (GetKey(XmppNamespaces.Jabber, "message") -> ChatMessage.ParseMessage)
 	def FromXMLReader(reader : XMLReader) : XmppProtocolMessage = {
 		var ns = reader.NamespaceURI
 		var name = reader.LocalName

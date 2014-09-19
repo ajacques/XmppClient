@@ -4,7 +4,9 @@ import net.technowizardry.xmpp.messages._
 
 class XmppSession(connection : XmppConnection) {
 	val correlator = new IqCorrelator()
+	var MessageReceivedCallback = (jid : Jid, message: String) => { println(message) }
 	connection.RegisterMessageCallback(classOf[IqResponseMessage], HandleIqMessage)
+	connection.RegisterMessageCallback(classOf[ChatMessage], HandleChatMessage)
 	def BindToResource(resourceName : String) {
 		SendIqRequest(new ResourceBindMessage(resourceName), "set", NoopCallback)
 	}
@@ -17,6 +19,12 @@ class XmppSession(connection : XmppConnection) {
 	}
 	def SendMessageTo(jid : Jid, message : String) {
 		connection.SendMessageImmediately(new ChatMessage(jid, message))
+	}
+	private def HandleChatMessage(message : XmppProtocolMessage) {
+		val msg = message match {
+			case x : ChatMessage => x
+		}
+		MessageReceivedCallback(msg.To, msg.MessageBody)
 	}
 	private def HandleIqMessage(message : XmppProtocolMessage) {
 		message match {

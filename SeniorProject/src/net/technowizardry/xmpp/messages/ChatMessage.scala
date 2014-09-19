@@ -13,4 +13,18 @@ class ChatMessage(to : Jid, body : String) extends XmppProtocolMessage with Writ
 		writer.WriteEndElement()
 		writer.WriteEndElement()
 	}
+	def To = to
+	def MessageBody = body
+}
+
+object ChatMessage {
+	def ParseMessage(reader : XMLReader) : XmppProtocolMessage = {
+		val from = Jid.FromString(reader.GetAttributeValue(null, "from"))
+		reader.Next()
+		reader.Next()
+		val body = reader.ElementText()
+		println(body)
+		reader.ReadUntilEndElement(XmppNamespaces.Jabber, "message")
+		new ChatMessage(from, body) // TODO: I'm stuffing the from into the to variable... BAD BAD BAD
+	}
 }
