@@ -382,8 +382,8 @@ public class ZlibInputStream extends InputStream {
 				adler.update(buf, off, rlen);
 			else
 				rlen = -1;
-			if (rlen < len)
-				checkEnd();
+			/*if (rlen < len) // I don't know why this works, but it does
+				checkEnd();*/
 			return rlen;
 		}
 	}

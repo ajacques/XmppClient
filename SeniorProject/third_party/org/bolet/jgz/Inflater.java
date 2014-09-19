@@ -765,6 +765,7 @@ public final class Inflater {
 			off += vlen;
 			len -= vlen;
 			rlen += vlen;
+			if (vlen == 0) break; // I don't know how this works
 		}
 		return rlen;
 	}
