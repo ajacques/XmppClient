@@ -5,8 +5,10 @@ import net.technowizardry.xmpp.messages._
 class XmppSession(connection : XmppConnection) {
 	val correlator = new IqCorrelator()
 	var MessageReceivedCallback = (jid : Jid, message: String) => { println(message) }
+	var PresenceUpdatedCallback = (from: Jid, updateType: String,  status: String, priority: Integer) => {}
 	connection.RegisterMessageCallback(classOf[IqResponseMessage], HandleIqMessage)
 	connection.RegisterMessageCallback(classOf[ChatMessage], HandleChatMessage)
+	connection.RegisterMessageCallback(classOf[PresenceUpdateMessage], HandlePresenceMessage)
 	def BindToResource(resourceName : String) {
 		SendIqRequest(new ResourceBindMessage(resourceName), "set", NoopCallback)
 	}
@@ -14,11 +16,20 @@ class XmppSession(connection : XmppConnection) {
 		val msg = correlator.RegisterRequest(iq, mtype, callback)
 		connection.SendMessageImmediately(msg)
 	}
+	def UpdateOwnStatus(status : String, message : String, priority : Int) {
+		connection.SendMessageImmediately(new PresenceUpdateMessage(status, message, priority))
+	}
 	def FetchRoster(callback : (List[XmppContact]) => Unit) {
 		SendIqRequest(new IqQueryBody(XmppNamespaces.Roster), "get", HandleRosterResponse(callback))
 	}
 	def SendMessageTo(jid : Jid, message : String) {
 		connection.SendMessageImmediately(new ChatMessage(jid, message))
+	}
+	private def HandlePresenceMessage(message : XmppProtocolMessage) {
+		val msg = message match {
+			case x : PresenceUpdateMessage => x
+		}
+		PresenceUpdatedCallback(msg.From, msg.UpdateType, msg.Status, msg.Priority)
 	}
 	private def HandleChatMessage(message : XmppProtocolMessage) {
 		val msg = message match {

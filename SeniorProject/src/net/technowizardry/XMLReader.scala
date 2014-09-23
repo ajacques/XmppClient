@@ -20,4 +20,12 @@ abstract class XMLReader {
 			return false
 		}
 	}
+	override def toString() : String = {
+		return NodeType() match {
+			case XMLObjectType.Document => String.format("XML Document")
+			case XMLObjectType.StartElement => String.format("XML Element: <%s xmlns='%s'", LocalName(), NamespaceURI())
+			case XMLObjectType.EndElement => String.format("XML End Element: </%s>", LocalName())
+			case XMLObjectType.Text => String.format("XML Characters: %s", ElementText())
+		}
+	}
 }

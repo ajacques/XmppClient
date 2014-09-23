@@ -20,13 +20,4 @@ class JavaXMLReader(stream : InputStream) extends XMLReader {
 	def NamespaceURI() = inner.getNamespaceURI()
 	def GetAttributeValue(ns : String, key : String) = inner.getAttributeValue(ns, key)
 	def ElementText() = inner.getElementText()
-
-	override def toString() : String = {
-		return inner.getEventType() match {
-			case XMLStreamConstants.START_DOCUMENT => String.format("XML Document: %s - %s", inner.getEncoding(), inner.getVersion())
-			case XMLStreamConstants.START_ELEMENT => String.format("XML Element: <%s xmlns='%s'", inner.getLocalName(), inner.getNamespaceURI())
-			case XMLStreamConstants.END_ELEMENT => String.format("XML End Element: </%s>", inner.getLocalName())
-			case XMLStreamConstants.CHARACTERS => String.format("XML Characters: %s", inner.getText())
-		}
-	}
 }
