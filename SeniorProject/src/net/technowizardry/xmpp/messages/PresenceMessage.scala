@@ -29,6 +29,14 @@ class PresenceUpdateMessage(from: Jid, status: String, updateType: String, messa
 	def UpdateType = updateType
 }
 
+class PresenceMessage(to : Jid, ptype : String) extends XmppProtocolMessage with WritableXmppMessage {
+	def WriteMessage(writer: XMLWriter) {
+		writer.WriteStartElement("presence", XmppNamespaces.Jabber)
+		writer.WriteAttribute("to", to.toString(), null)
+		writer.WriteEndElement()
+	}
+}
+
 object PresenceMessage {
 	def Parse(reader: XMLReader) : XmppProtocolMessage = {
 		val from = Jid.FromString(reader.GetAttributeValue(null, "from"))

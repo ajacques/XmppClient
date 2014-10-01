@@ -16,6 +16,12 @@ class XmppSession(connection : XmppConnection) {
 		val msg = correlator.RegisterRequest(iq, mtype, callback)
 		connection.SendMessageImmediately(msg)
 	}
+	def ApproveSubscriptionRequest(jid : Jid) {
+		connection.SendMessageImmediately(new PresenceMessage(jid, "subscribed"))
+	}
+	def SendRequest(jid : Jid) {
+		connection.SendMessageImmediately(new PresenceMessage(jid, "subscribe"))
+	}
 	def UpdateOwnStatus(status : String, message : String, priority : Int) {
 		connection.SendMessageImmediately(new PresenceUpdateMessage(status, message, priority))
 	}
