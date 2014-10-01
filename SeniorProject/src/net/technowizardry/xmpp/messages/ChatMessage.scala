@@ -21,8 +21,20 @@ object ChatMessage {
 	def ParseMessage(reader : XMLReader) : XmppProtocolMessage = {
 		val from = Jid.FromString(reader.GetAttributeValue(null, "from"))
 		reader.Next()
+		var body : String = null
+		while (!reader.IsExpectedEndElement(XmppNamespaces.Jabber, "presence")) {
+			println(reader.toString() + " " + reader.ElementText())
+			reader.LocalName() match {
+				case "body" => {
+					reader.Next()
+					body = reader.ElementText()
+					reader.Next()
+				}
+				case _ =>
+			}
+			reader.Next()
+		}
 		reader.Next()
-		val body = reader.ElementText()
 		println(body)
 		reader.ReadUntilEndElement(XmppNamespaces.Jabber, "message")
 		new ChatMessage(from, body) // TODO: I'm stuffing the from into the to variable... BAD BAD BAD

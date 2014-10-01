@@ -41,13 +41,20 @@ class XmppSession(connection : XmppConnection) {
 		val msg = message match {
 			case x : ChatMessage => x
 		}
+		if (msg.MessageBody == null) {
+			return;
+		}
 		MessageReceivedCallback(msg.To, msg.MessageBody)
 	}
 	private def HandleIqMessage(message : XmppProtocolMessage) {
-		message match {
-			case x : IqResponseMessage => {
-				correlator.FetchCallback(x)(x)
+		try {
+			message match {
+				case x : IqResponseMessage => {
+					correlator.FetchCallback(x)(x)
+				}
 			}
+		} catch {
+			case x : NoSuchElementException => {}
 		}
 	}
 	private def HandleRosterResponse(callback : (List[XmppContact]) => Unit)(message : IqResponseMessage) {
