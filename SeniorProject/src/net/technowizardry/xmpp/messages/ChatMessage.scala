@@ -22,8 +22,7 @@ object ChatMessage {
 		val from = Jid.FromString(reader.GetAttributeValue(null, "from"))
 		reader.Next()
 		var body : String = null
-		while (!reader.IsExpectedEndElement(XmppNamespaces.Jabber, "presence")) {
-			println(reader.toString() + " " + reader.ElementText())
+		while (!reader.IsExpectedEndElement(XmppNamespaces.Jabber, "message")) {
 			reader.LocalName() match {
 				case "body" => {
 					reader.Next()
@@ -36,7 +35,6 @@ object ChatMessage {
 		}
 		reader.Next()
 		println(body)
-		reader.ReadUntilEndElement(XmppNamespaces.Jabber, "message")
 		new ChatMessage(from, body) // TODO: I'm stuffing the from into the to variable... BAD BAD BAD
 	}
 }
