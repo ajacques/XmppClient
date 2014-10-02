@@ -14,5 +14,6 @@
     <string name="createAccount">Create Account</string>
     <string name="actionBarNewConversation">New Conversation</string>
     <string name="sendMessageHint">Send Message</string>
+    <string name="sendButton">Send</string>
 
 </resources>

@@ -30,7 +30,7 @@ class XmppStream(inputStream : InputStream, outputStream : OutputStream, streamF
 					println("Entering XMPP message read loop TID: " + Thread.currentThread().getId())
 					while (runReaderThread && reader.HasNext()) {
 						reader.Next()
-						println("Got something: " + reader.NamespaceURI())
+						println("Got something: " + reader.NamespaceURI() + reader.LocalName())
 						messageReader(reader)
 					}
 				} finally {

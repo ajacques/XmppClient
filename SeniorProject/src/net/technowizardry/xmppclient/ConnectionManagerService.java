@@ -3,22 +3,23 @@ package net.technowizardry.xmppclient;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
-import java.util.concurrent.Semaphore;
 
-import scala.Function0;
 import scala.Function1;
+import scala.Function2;
 import scala.collection.JavaConversions;
 import scala.collection.immutable.List;
-import scala.runtime.AbstractFunction0;
 import scala.runtime.AbstractFunction1;
+import scala.runtime.AbstractFunction2;
 import scala.runtime.BoxedUnit;
 import net.technowizardry.XMLStreamFactoryFactory;
 import net.technowizardry.xmppclient.networking.ExternalLibraryBasedDnsResolver;
 import net.technowizardry.xmppclient.networking.ServiceEndpointResolver;
+import net.technowizardry.xmpp.Jid;
 import net.technowizardry.xmpp.XmppConnection;
 import net.technowizardry.xmpp.XmppContact;
 import net.technowizardry.xmpp.XmppSession;
 import net.technowizardry.xmppclient.networking.XmppSocketFactory;
+import net.technowizardry.xmppclient.ui.ChatActivity;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -33,12 +34,11 @@ public class ConnectionManagerService extends Service {
 	private String password;
 	private XmppConnection connection;
 	private XmppSocketFactory factory;
-	private XmppSession session;
+	private static XmppSession session;
+	private static Iterable<XmppContact> theRoster;
 	public static final String BROADCAST_ACTION = "net.technowizardry.xmppclient.BROADCAST";
 
-	public ConnectionManagerService() {
-		
-	}
+	public ConnectionManagerService() {}
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
@@ -74,7 +74,6 @@ public class ConnectionManagerService extends Service {
 
 				if(socket.isConnected()) {
 					try {
-						connectionCompleted();
 						Function1<Object, BoxedUnit> loginCallback = new AbstractFunction1<Object, BoxedUnit>() {
 							@Override
 							public BoxedUnit apply(Object success) {
@@ -99,11 +98,45 @@ public class ConnectionManagerService extends Service {
 
 	}
 
-	private void connectionCompleted() {
+	private void rosterComplete() {
 		Intent broadcast = new Intent();
 		broadcast.setAction(BROADCAST_ACTION);
 		broadcast.putExtra("connection", "Connected");
 		this.sendBroadcast(broadcast);
+	}
+
+	private void connectionCompleted() {
+		session = new XmppSession(connection);
+		Function1<List<XmppContact>, BoxedUnit> rosterCallback = new AbstractFunction1<List<XmppContact>, BoxedUnit>() {
+			@Override
+			public BoxedUnit apply(List<XmppContact> contacts) {
+				theRoster = JavaConversions.asJavaIterable(contacts);
+				Log.d("LOG", "CONTACTS");
+				for (XmppContact contact : theRoster) {
+					Log.d("LOG", contact.toString());
+				}
+				rosterComplete();
+				return null;
+			}
+		};
+		session.BindToResource("android-phone");
+		session.FetchRoster(rosterCallback);
+		session.UpdateOwnStatus(null, null, 5);
+
+		Function2<Jid, String, BoxedUnit> messageCallback = new AbstractFunction2<Jid, String, BoxedUnit>() {
+			@Override
+			public BoxedUnit apply(Jid jid, String message) {
+				System.out.println("New Message from: " + jid.toString() + ": " + message.toString());
+				receivedMessage(jid, message);
+				return null;
+			}
+		};
+		session.MessageReceivedCallback_$eq(messageCallback);
+	}
+
+	public void receivedMessage(Jid jid, String message) {
+		MessageHistory.AddToHistory(this, jid, message);
+		ChatActivity.loadMessage(jid, message, "Now", false);
 	}
 
 	private void connectionFailed() {
@@ -113,6 +146,22 @@ public class ConnectionManagerService extends Service {
 		this.sendBroadcast(broadcast);
 	}
 
+	public static Iterable<XmppContact> getRoster() {
+		return theRoster;
+	}
+
+	public static void sendMessage(Jid contact, String message) {
+		final Jid c = contact;
+		final String m = message;
+
+		Thread t = new Thread(){
+			public void run() {
+				session.SendMessageTo(c, m);
+			}
+		};
+		t.start();
+
+	}
 	@Override
 	public void onDestroy() {
 		connection.Disconnect();

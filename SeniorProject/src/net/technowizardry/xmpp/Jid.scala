@@ -1,6 +1,6 @@
 package net.technowizardry.xmpp
 
-class Jid(username : String, domain : String, resource : String) {
+class Jid (username : String, domain : String, resource : String) {
 	def this(username : String, domain : String) = this(username, domain, null)
 	def Username = username
 	def Domain = domain

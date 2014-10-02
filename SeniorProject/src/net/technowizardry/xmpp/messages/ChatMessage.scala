@@ -33,8 +33,6 @@ object ChatMessage {
 			}
 			reader.Next()
 		}
-		reader.Next()
-		println(body)
 		new ChatMessage(from, body) // TODO: I'm stuffing the from into the to variable... BAD BAD BAD
 	}
 }

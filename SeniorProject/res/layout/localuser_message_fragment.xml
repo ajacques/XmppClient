@@ -46,6 +46,7 @@
             android:gravity="top|start"
             android:singleLine="true"
             android:text="@string/UITestDate"
-            android:textColor="#EEEEEE" />
+            android:textColor="#EEEEEE"
+            android:textSize="@dimen/dateTextSize" />
     </LinearLayout>
 </LinearLayout>

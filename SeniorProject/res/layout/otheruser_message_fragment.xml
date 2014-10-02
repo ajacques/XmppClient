@@ -34,7 +34,8 @@
             android:gravity="top|end"
             android:singleLine="true"
             android:text="@string/UITestDate"
-            android:textColor="#EEEEEE" />
+            android:textColor="#EEEEEE"
+            android:textSize="@dimen/dateTextSize" />
     </LinearLayout>
     <LinearLayout
         android:id="@+id/otherUserImageLL"

@@ -6,5 +6,6 @@
     <dimen name="homeUsernameTextSize">20dp</dimen>
     <dimen name="homeChatTextSize">16dp</dimen>
     <dimen name="createAccount">12dp</dimen>
+    <dimen name="dateTextSize">12dp</dimen>
 
 </resources>

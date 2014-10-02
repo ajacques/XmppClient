@@ -1,5 +1,7 @@
 package net.technowizardry.xmppclient.ui;
 
+import net.technowizardry.xmpp.XmppContact;
+import net.technowizardry.xmppclient.ConnectionManagerService;
 import net.technowizardry.xmppclient.R;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -9,9 +11,6 @@ import android.view.Menu;
 import android.view.MenuItem;
 
 public class NewConversationActivity extends Activity {
-	private String localName;
-	private FragmentManager fragmentManager;
-	private FragmentTransaction fragmentTransaction;
 
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -21,12 +20,17 @@ public class NewConversationActivity extends Activity {
 	}
 
 	private void loadRoster() {
-		localName = "GET ROSTER NAMES";
-
+		FragmentManager fragmentManager;
+		FragmentTransaction fragmentTransaction;
 		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
-		ContactFragment fragment = new ContactFragment(localName);
-		fragmentTransaction.add(R.id.contactMainLLayout , fragment, "one");
+
+		Iterable<XmppContact> roster;
+		roster = ConnectionManagerService.getRoster();
+		for (XmppContact contact : roster) {
+			ContactFragment fragment = new ContactFragment(contact.Username());
+			fragmentTransaction.add(R.id.contactMainLLayout , fragment, "one");
+		}
 		fragmentTransaction.commit();
 	}
 

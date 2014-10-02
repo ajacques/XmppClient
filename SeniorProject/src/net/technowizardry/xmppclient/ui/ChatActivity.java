@@ -1,5 +1,11 @@
 package net.technowizardry.xmppclient.ui;
 
+import scala.collection.JavaConversions;
+import scala.collection.immutable.List;
+import net.technowizardry.xmpp.Jid;
+import net.technowizardry.xmppclient.ConnectionManagerService;
+import net.technowizardry.xmppclient.Message;
+import net.technowizardry.xmppclient.MessageHistory;
 import net.technowizardry.xmppclient.R;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -7,50 +13,62 @@ import android.app.FragmentTransaction;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.EditText;
+import android.widget.ImageButton;
 
 public class ChatActivity extends Activity {
+	private ImageButton sendButton;
+	private Jid contact;
+	private static FragmentManager fragmentManager;
+	private static FragmentTransaction fragmentTransaction;
 
+	public ChatActivity(){}
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.chat_screen);
+		String localName = getIntent().getStringExtra("local");
+		String domainName = getIntent().getStringExtra("domain");
+		contact = new Jid(localName, domainName);
 
-		loadMessages();
+		fragmentManager = getFragmentManager();
+
+		loadConversation();
+		sendButton = (ImageButton)findViewById(R.id.sendButton);
+		sendButton.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				sendMessage();
+			}
+		});
 	}
 
-	private void loadMessages() {
-		FragmentManager fragmentManager;
-		FragmentTransaction fragmentTransaction;
-		fragmentManager = getFragmentManager();
-		fragmentTransaction = fragmentManager.beginTransaction();
-		MessageFragment fragment = new MessageFragment("Cody", "Hey whats uppp", true);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "nothing, you are the most important person ever to me", false);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+	private void sendMessage() {
+		EditText messageText = (EditText)findViewById(R.id.chatBox);
+		if (!messageText.getText().toString().isEmpty()) {
+			MessageHistory.AddToHistory(this, contact, messageText.getText().toString());
+			ConnectionManagerService.sendMessage(contact, messageText.getText().toString());
+			loadMessage(contact, messageText.getText().toString(), "Now", true);
+			messageText.setText("");
+		}
+	}
 
-		fragment = new MessageFragment("Cody", "How nice of you to say that <3", true);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "Java Sucks!", false);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Cody", "nothing is worse that doing java with eclipse", true);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", true);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", true);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", true);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", true);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
-		fragment = new MessageFragment("Adam", "then mixing it with android is asking for death", false);
-		fragmentTransaction.add(R.id.chatMainLLayout , fragment, "one");
+	private void loadConversation() {
+		List<Message> conversation = MessageHistory.GetHistory(this, contact);
+		for (Message message : JavaConversions.asJavaCollection(conversation)) {
+			if(message.Source().equals(contact)) {
+				loadMessage(message.Source(), message.Message(), message.Date().toString(), false);
+			}
+			else {
+				loadMessage(message.Source(), message.Message(), message.Date().toString(), true);
+			}
+		}
+	}
+
+	public static void loadMessage(Jid sender, String message, String date, boolean isLocal) {
+		fragmentTransaction = fragmentManager.beginTransaction();
+		MessageFragment frag = new MessageFragment(message, date, isLocal);
+		fragmentTransaction.add(R.id.chatMainLLayout, frag, "one");
 		fragmentTransaction.commit();
 	}
 

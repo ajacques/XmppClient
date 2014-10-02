@@ -1,6 +1,11 @@
 package net.technowizardry.xmppclient.ui;
 
+import scala.collection.immutable.List;
+import net.technowizardry.xmpp.Jid;
+import net.technowizardry.xmpp.XmppContact;
 import net.technowizardry.xmppclient.ConnectionManagerService;
+import net.technowizardry.xmppclient.Message;
+import net.technowizardry.xmppclient.MessageHistory;
 import net.technowizardry.xmppclient.R;
 import android.app.Activity;
 import android.app.FragmentManager;
@@ -10,12 +15,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.MotionEvent;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -84,9 +86,16 @@ public class HomeActivity extends Activity {
 	private void loadConversations() {
 		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
-		String message = "Need to get all mesages! Need to get all mesages! Need to get all mesages! Need to get all mesages!";
-		ConversationFragment fragment = new ConversationFragment(localName, "getOtherUsernameFromDatbase", message, "10:49 AM");
-		fragmentTransaction.add(R.id.homeMainLLayout , fragment, "one");
+
+		Iterable<XmppContact> roster;
+		roster = ConnectionManagerService.getRoster();
+		for (XmppContact contact : roster) {
+			List<Message> message = MessageHistory.GetHistory(this, Jid.FromString(contact.Username().toString()));
+			if (!message.isEmpty()) {
+				ConversationFragment fragment = new ConversationFragment(contact.Username().Username().toString(), contact.Username().Domain().toString(), "get latest message", "date");
+				fragmentTransaction.add(R.id.homeMainLLayout , fragment, "one");
+			}
+		}
 		fragmentTransaction.commit();
 	}
 
@@ -115,7 +124,6 @@ public class HomeActivity extends Activity {
 			else if(connectionReturnData.equals("Failed")) {
 				connectionFailed();
 			}
-			Log.d("LOG", connectionReturnData);
 		}
 	};
 
