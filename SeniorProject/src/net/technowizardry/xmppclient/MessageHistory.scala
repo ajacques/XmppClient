@@ -16,7 +16,6 @@ class Message(source : Jid, date : Date, message : String) {
 object MessageHistory {
 	def GetHistory(context : Context, jid : Jid) : List[Message] = {
 		val name = String.format("chats-%s", jid.GetBareJid().toString())
-		println(name)
 		try {
 			val file = context.openFileInput(name)
 			val reader = new BufferedReader(new InputStreamReader(file))
@@ -40,12 +39,12 @@ object MessageHistory {
 			}
 		}
 	}
-	def AddToHistory(context : Context, jid : Jid, message : String) {
+	def AddToHistory(context : Context, jid : Jid, sender : Jid, message : String) {
 		val name = String.format("chats-%s", jid.GetBareJid().toString())
 		val file = context.openFileOutput(name, Context.MODE_APPEND)
 		val writer = new BufferedWriter(new OutputStreamWriter(file))
 		val parser = new SimpleDateFormat("yyyy-MM-dd HH:mm")
-		writer.write(jid.GetBareJid().toString())
+		writer.write(sender.GetBareJid().toString())
 		writer.newLine()
 		writer.write(parser.format(new Date()))
 		writer.newLine()

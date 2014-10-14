@@ -29,7 +29,7 @@ public class NewConversationActivity extends Activity {
 		roster = ConnectionManagerService.getRoster();
 		for (XmppContact contact : roster) {
 			ContactFragment fragment = new ContactFragment(contact.Username());
-			fragmentTransaction.add(R.id.contactMainLLayout , fragment, "one");
+			fragmentTransaction.add(R.id.contactMainLLayout , fragment);
 		}
 		fragmentTransaction.commit();
 	}

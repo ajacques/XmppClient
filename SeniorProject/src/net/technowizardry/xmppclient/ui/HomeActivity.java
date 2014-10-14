@@ -8,106 +8,100 @@ import net.technowizardry.xmppclient.Message;
 import net.technowizardry.xmppclient.MessageHistory;
 import net.technowizardry.xmppclient.R;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
 public class HomeActivity extends Activity {
-	private Intent connectionManagerIntent;
-	private String connectionReturnData;
 	private String localName;
 	private String domainName;
 	private String password;
-	private TextView invalid;
-	private EditText loginText;
-	private FragmentManager fragmentManager;
-	private FragmentTransaction fragmentTransaction;
+	private static FragmentManager fragmentManager;
+	private static FragmentTransaction fragmentTransaction;
+	private static boolean isActive;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		connectionReturnData = null;
+		isActive = true;
 		localName = getIntent().getStringExtra("localName");
 		domainName = getIntent().getStringExtra("domainName");
 		password = getIntent().getStringExtra("password");
-
-		startConnectivityManager();
 		setContentView(R.layout.login_loading);
-	}
-
-	private void main() {
-		/*View container = findViewById(R.id.conversationLinearLayout);
-		container.setOnHoverListener(new View.OnHoverListener() {
-			@Override
-			public boolean onHover(View v, MotionEvent event) {
-				Log.d("LOG", "Hover: ");
-				return false;
-			}*/
-		/*	@Override
-			public boolean More onHover(View v, MotionEvent event) {
-				switch (event.getAction()) {
-				case MotionEvent.ACTION_HOVER_ENTER:
-					mMessageTextView.setText(Hover.this.getResources().getString(
-					R.string.hover_message_entered_at,
-					event.getX(), event.getY()));
-					break;
-				case MotionEvent.ACTION_HOVER_MOVE:
-					mMessageTextView.setText(Hover.this.getResources().getString(
-					R.string.hover_message_moved_at,
-					event.getX(), event.getY()));
-					break;
-				case MotionEvent.ACTION_HOVER_EXIT:
-					mMessageTextView.setText(Hover.this.getResources().getString(
-					R.string.hover_message_exited_at,
-					event.getX(), event.getY()));
-					break;
-				}
-				return false;
-			}*/
-		//});
+		fragmentManager = getFragmentManager();
+		SharedPreferences pref = getApplicationContext().getSharedPreferences("MyProperties", 0);
+		if(!pref.getBoolean("loggedIn", false) || !ConnectionManagerService.isStarted()) {
+			startConnectivityManager();
+		}
+		else {
+			loadHomeScreen();
+		}
 	}
 
 	private void loadHomeScreen() {
 		setContentView(R.layout.home_screen);
 		loadConversations();
-		main();
+	}
+
+	public static void newMessage(Jid jid, String message, String date, Boolean isLocal) {
+		Fragment frag = fragmentManager.findFragmentByTag(jid.GetBareJid().toString());
+		fragmentTransaction = fragmentManager.beginTransaction();
+		ConversationFragment fragment = new ConversationFragment(jid.GetBareJid().Username(), jid.GetBareJid().Domain(), message, date);
+		if (frag == null) {
+			fragmentTransaction.add(R.id.homeMainLLayout , fragment, jid.GetBareJid().toString());
+		}
+		else {
+			fragmentTransaction.replace(R.id.homeMainLLayout, fragment, jid.GetBareJid().toString());
+		}
+		if (isActive) {// && activityCreated) {
+			fragmentTransaction.commit();
+		}
+		ChatActivity.loadMessage(jid, message, date, isLocal);
 	}
 
 	private void loadConversations() {
-		fragmentManager = getFragmentManager();
 		fragmentTransaction = fragmentManager.beginTransaction();
-
 		Iterable<XmppContact> roster;
 		roster = ConnectionManagerService.getRoster();
 		for (XmppContact contact : roster) {
-			List<Message> message = MessageHistory.GetHistory(this, Jid.FromString(contact.Username().toString()));
-			if (!message.isEmpty()) {
-				ConversationFragment fragment = new ConversationFragment(contact.Username().Username().toString(), contact.Username().Domain().toString(), "get latest message", "date");
-				fragmentTransaction.add(R.id.homeMainLLayout , fragment, "one");
+			List<Message> messages = MessageHistory.GetHistory(this, contact.Username().GetBareJid());
+			if (!messages.isEmpty()) {
+				Message m = messages.last();
+				Fragment frag = fragmentManager.findFragmentByTag(contact.Username().GetBareJid().toString());
+				ConversationFragment fragment = new ConversationFragment(contact.Username().GetBareJid().Username(),
+						contact.Username().GetBareJid().Domain(), m.Message(), m.Date().toString());
+				if (frag == null) {
+					fragmentTransaction.add(R.id.homeMainLLayout , fragment, contact.Username().GetBareJid().toString());
+				}
+				else {
+					fragmentTransaction.replace(R.id.homeMainLLayout, fragment, contact.Username().GetBareJid().toString());
+				}
 			}
 		}
 		fragmentTransaction.commit();
+		ConnectionManagerService.isLoading = false;
 	}
 
 	private void connectionFailed() {
+		//need to restart loginActivity as well.....
 		setContentView(R.layout.login_screen);
-		invalid = (TextView)findViewById(R.id.invalidUsernameTextView);
+		TextView invalid = (TextView)findViewById(R.id.invalidUsernameTextView);
 		invalid.setText("Invalid Username or Password");
-		loginText = (EditText)findViewById(R.id.loginUsername);
 	}
 
 	private void startConnectivityManager() {
-		connectionManagerIntent = new Intent(getApplicationContext(), ConnectionManagerService.class);
+		Intent connectionManagerIntent = new Intent(getApplicationContext(), ConnectionManagerService.class);
 		connectionManagerIntent.putExtra("domainName", domainName);
 		connectionManagerIntent.putExtra("localName", localName);
 		connectionManagerIntent.putExtra("password", password);
@@ -117,7 +111,7 @@ public class HomeActivity extends Activity {
 	private BroadcastReceiver connectionReceiver = new BroadcastReceiver() {
 		@Override
 		public void onReceive(Context context, Intent intent) {
-			connectionReturnData = intent.getStringExtra("connection");
+			String connectionReturnData = intent.getStringExtra("connection");
 			if(connectionReturnData.equals("Connected")) {
 				loadHomeScreen();
 			}
@@ -156,11 +150,19 @@ public class HomeActivity extends Activity {
 
 	protected void onResume() {
 		super.onResume();
+		isActive = true;
 		registerReceiver(connectionReceiver, new IntentFilter(ConnectionManagerService.BROADCAST_ACTION));
+		if (ConnectionManagerService.isStarted()) {
+			loadConversations();
+		}
 	}
-
+	protected void onDestroy() {
+		super.onDestroy();
+		isActive = false;
+	}
 	protected void onPause() {
 		super.onPause();
+		isActive = false;
 		unregisterReceiver(connectionReceiver);
 	}
 

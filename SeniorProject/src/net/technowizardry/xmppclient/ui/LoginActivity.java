@@ -11,6 +11,7 @@ import net.technowizardry.xmppclient.ui.HomeActivity;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.view.Menu;
@@ -34,6 +35,15 @@ public class LoginActivity extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.login_screen);
+		SharedPreferences pref = getApplicationContext().getSharedPreferences("MyProperties", 0);
+		if(pref.getBoolean("loggedIn", false)) {
+			Intent nextIntent = new Intent(getApplicationContext(), HomeActivity.class);
+			nextIntent.putExtra("domainName", pref.getString("domainName", null));
+			nextIntent.putExtra("localName", pref.getString("localName", null));
+			nextIntent.putExtra("password", pref.getString("password", null));
+			startActivity(nextIntent);
+			finish();
+		}
 		invalid = (TextView)findViewById(R.id.invalidUsernameTextView);
 		loginText = (EditText)findViewById(R.id.loginUsername);
 		passText = (EditText)findViewById(R.id.loginPassword);
