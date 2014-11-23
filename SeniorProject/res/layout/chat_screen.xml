@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#000000" >
+    android:background="#F0F0F0" >
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -30,7 +30,7 @@
         android:id="@+id/chatBoxLLayout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="#66999999"
+        android:background="#EBEBEB"
         android:orientation="horizontal"
         android:gravity="bottom"
         android:paddingTop="2dp" >

@@ -12,7 +12,7 @@
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="wrap_content"
-        android:background="#777777"
+        android:background="#d6edd8"
         android:orientation="vertical"
         android:padding="3dp"
         android:layout_weight=".8" >
@@ -23,7 +23,7 @@
             android:layout_height="wrap_content"
             android:singleLine="false"
             android:text="@string/UITestConv"
-            android:textColor="#EEEEEE"
+            android:textColor="#000000"
             android:textSize="@dimen/homeChatTextSize" />
 
         <TextView
@@ -34,25 +34,25 @@
             android:gravity="top|end"
             android:singleLine="true"
             android:text="@string/UITestDate"
-            android:textColor="#EEEEEE"
+            android:textColor="#000000"
             android:textSize="@dimen/dateTextSize" />
     </LinearLayout>
     <LinearLayout
         android:id="@+id/otherUserImageLL"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#777777"
+        android:layout_height="match_parent"
+        android:background="#d6edd8"
         android:orientation="vertical"
         android:layout_weight=".2" >
 
         <ImageView
             android:id="@+id/otherUserImage"
-            android:layout_width="30dp"
-            android:layout_height="30dp"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
             android:layout_marginEnd="2dp"
             android:layout_marginRight="2dp"
             android:contentDescription="@string/userImage"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/batchat_logo" />
 
     </LinearLayout>
 </LinearLayout>

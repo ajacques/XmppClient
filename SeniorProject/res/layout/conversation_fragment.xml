@@ -5,7 +5,7 @@
     android:layout_height="60dp"
     android:layout_gravity="top"
     android:layout_marginBottom="1dp"
-    android:background="#444444"
+    android:background="#EBEBEB"
     android:clickable="true"
     android:gravity="top"
     android:orientation="horizontal" >
@@ -19,7 +19,7 @@
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:contentDescription="@string/userImage"
-            android:src="@drawable/ic_launcher" />
+            android:src="@drawable/batchat_logo" />
 
     </LinearLayout>
 
@@ -41,7 +41,7 @@
                 android:gravity="top|start"
                 android:singleLine="true"
                 android:text="@string/UITestUsername"
-                android:textColor="#EEEEEE"
+                android:textColor="#000000"
                 android:textSize="@dimen/homeUsernameTextSize" />
 
             <TextView
@@ -51,7 +51,7 @@
                 android:gravity="top|end"
                 android:singleLine="true"
                 android:text="@string/UITestDate"
-                android:textColor="#EEEEEE"
+                android:textColor="#000000"
                 android:textSize="@dimen/dateTextSize" />
 
         </LinearLayout>
@@ -68,7 +68,7 @@
                 android:layout_gravity="start|bottom"
                 android:singleLine="true"
                 android:text="@string/UITestConv"
-                android:textColor="#EEEEEE"
+                android:textColor="#000000"
                 android:textSize="@dimen/homeChatTextSize" />
         </LinearLayout>
     </LinearLayout>

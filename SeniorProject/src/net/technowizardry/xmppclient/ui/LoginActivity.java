@@ -22,7 +22,6 @@ import android.widget.EditText;
 import android.widget.TextView;
 
 public class LoginActivity extends Activity {
-	private String username;
 	private String domainName;
 	private String localName;
 	private String password;
@@ -34,6 +33,7 @@ public class LoginActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		getActionBar().hide();
 		setContentView(R.layout.login_screen);
 		SharedPreferences pref = getApplicationContext().getSharedPreferences("MyProperties", 0);
 		if(pref.getBoolean("loggedIn", false)) {
@@ -44,11 +44,15 @@ public class LoginActivity extends Activity {
 			startActivity(nextIntent);
 			finish();
 		}
+		if(getIntent().getBooleanExtra("failed", false) == true) {
+			TextView invalid = (TextView)findViewById(R.id.invalidUsernameTextView);
+			invalid.setText("Invalid Username or Password");
+		}
+
 		invalid = (TextView)findViewById(R.id.invalidUsernameTextView);
 		loginText = (EditText)findViewById(R.id.loginUsername);
 		passText = (EditText)findViewById(R.id.loginPassword);
 		signInButton = (Button)findViewById(R.id.signInButton);
-		username = null;
 		domainName = null;
 		localName = null;
 		password = null;
@@ -98,12 +102,16 @@ public class LoginActivity extends Activity {
 		case R.id.signInButton:
 			signInButton.setEnabled(false);
 
-			username = loginText.getText().toString().trim();
+			String username = loginText.getText().toString().trim();
 			int index = username.indexOf("@");
 			domainName = (index == -1) ? "" : username.substring(index+1, username.length());
 			password = passText.getText().toString();
-			if (domainName == "" || password == "") {
-				invalid.setText("Invalid Username or Password");
+			if (domainName == "") {
+				invalid.setText("Invalid Username");
+				signInButton.setEnabled(true);
+			}
+			else if (password == "") {
+				invalid.setText("Invalid Password");
 				signInButton.setEnabled(true);
 			}
 			else {

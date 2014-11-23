@@ -16,11 +16,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
-import android.widget.TextView;
 import android.widget.Toast;
 
 public class HomeActivity extends Activity {
@@ -64,7 +64,7 @@ public class HomeActivity extends Activity {
 		else {
 			fragmentTransaction.replace(R.id.homeMainLLayout, fragment, jid.GetBareJid().toString());
 		}
-		if (isActive) {// && activityCreated) {
+		if (isActive) {
 			fragmentTransaction.commit();
 		}
 		ChatActivity.loadMessage(jid, message, date, isLocal);
@@ -95,9 +95,10 @@ public class HomeActivity extends Activity {
 
 	private void connectionFailed() {
 		//need to restart loginActivity as well.....
-		setContentView(R.layout.login_screen);
-		TextView invalid = (TextView)findViewById(R.id.invalidUsernameTextView);
-		invalid.setText("Invalid Username or Password");
+		Intent nextIntent = new Intent(getApplicationContext(), LoginActivity.class);
+		nextIntent.putExtra("failed", true);
+		startActivity(nextIntent);
+		finish();
 	}
 
 	private void startConnectivityManager() {
@@ -143,6 +144,16 @@ public class HomeActivity extends Activity {
 			return true;
 		case R.id.action_settings:
 			Toast.makeText(getBaseContext(),  "clicked action settings button", Toast.LENGTH_LONG).show();
+			return true;
+		case R.id.action_logout:
+			SharedPreferences pref = getApplicationContext().getSharedPreferences("MyProperties", 0);
+			Editor editor = pref.edit();
+			editor.clear();
+			editor.commit();
+			Intent logoutIntent = new Intent(getApplicationContext(), LoginActivity.class);
+			startActivity(logoutIntent);
+			ConnectionManagerService.logout();
+			finish();
 			return true;
 		}
 		return super.onOptionsItemSelected(item);

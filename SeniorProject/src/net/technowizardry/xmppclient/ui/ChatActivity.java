@@ -1,21 +1,26 @@
 package net.technowizardry.xmppclient.ui;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 import scala.collection.JavaConversions;
 import scala.collection.immutable.List;
 import net.technowizardry.xmpp.Jid;
 import net.technowizardry.xmppclient.ConnectionManagerService;
 import net.technowizardry.xmppclient.Message;
 import net.technowizardry.xmppclient.MessageHistory;
-import net.technowizardry.xmppclient.MyProperties;
 import net.technowizardry.xmppclient.R;
 import android.app.Activity;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
+import android.support.v4.app.NavUtils;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.app.ActionBar;
+import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
@@ -58,7 +63,7 @@ public class ChatActivity extends Activity {
 			Jid myJid = new Jid(pref.getString("localName", null),pref.getString("domainName", null));
 			MessageHistory.AddToHistory(this, contact, myJid, messageText.getText().toString());
 			ConnectionManagerService.sendMessage(contact, messageText.getText().toString());
-			loadMessage(myJid, messageText.getText().toString(), "Now", true);
+			loadMessage(myJid, messageText.getText().toString(), new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy").format(new Date()), true);
 			messageText.setText("");
 			scrollDown();
 		}
@@ -112,7 +117,18 @@ public class ChatActivity extends Activity {
 			case R.id.action_settings:
 				return true;
 			case android.R.id.home:
+				NavUtils.navigateUpFromSameTask(this);
 				return true; //implement back button eventually
+			case R.id.action_logout:
+				SharedPreferences pref = getApplicationContext().getSharedPreferences("MyProperties", 0);
+				Editor editor = pref.edit();
+				editor.clear();
+				editor.commit();
+				ConnectionManagerService.logout();
+				Intent logoutIntent = new Intent(getApplicationContext(), LoginActivity.class);
+				startActivity(logoutIntent);
+				finish();
+				return true;
 		}
 
 		return super.onOptionsItemSelected(item);

@@ -1,74 +1,106 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/loginScreenRelativeLayout"
     android:layout_width="fill_parent"
     android:layout_height="fill_parent"
-    android:background="#000000"
+    android:background="#26C6DA"
     android:orientation="vertical" >
 
-   <EditText
-        android:id="@+id/loginUsername"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/loginPassword"
-        android:layout_centerHorizontal="true"
-        android:layout_marginBottom="18dp"
-        android:background="#888888"
-        android:ems="14"
-        android:hint="@string/enterEmailAddress"
-        android:inputType="textEmailAddress"
-        android:singleLine="true"
-        android:textColor="#000000"
-        android:textColorHint="#66000000"
-        android:textSize="15sp" >
-    </EditText>
+    <LinearLayout
+        android:id="@+id/loginLogoLLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:paddingTop="2dp"
+        android:layout_weight=".4" >
 
-    <Button
-        android:id="@+id/signInButton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:onClick="onClick"
-        android:text="@string/Sign_In" />
+        <ImageView
+            android:id="@+id/loginLogo"
+            android:layout_width="200dp"
+            android:layout_height="80dp"
+            android:layout_gravity="center_vertical|center_horizontal"
+            android:src="@drawable/batchat_stripped" />
 
-    <EditText
-        android:id="@+id/loginPassword"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/signInButton"
-        android:layout_alignStart="@+id/loginUsername"
-        android:layout_alignLeft="@+id/loginUsername"
-        android:layout_marginBottom="15dp"
-        android:background="#888888"
-        android:ems="14"
-        android:hint="@string/enterPassword"
-        android:inputType="textPassword"
-        android:singleLine="true"
-        android:textColorHint="#66000000"
-        android:textSize="15sp" />
+        <TextView
+            android:id="@+id/batChatTextLogo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:clickable="false"
+            android:text="@string/BatChat"
+            android:textColor="#333333"
+            android:textSize="25sp" />
 
-    <TextView
+    </LinearLayout>
+    <LinearLayout
+        android:id="@+id/loginInfoLLayout"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:orientation="vertical"
+        android:layout_gravity="center_vertical"
+        android:paddingTop="2dp"
+        android:layout_weight=".6" >
+
+        <EditText
+            android:id="@+id/loginUsername"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:background="#F0F0F0"
+            android:ems="14"
+            android:hint="@string/enterEmailAddress"
+            android:inputType="textEmailAddress"
+            android:singleLine="true"
+            android:textColor="#000000"
+            android:textColorHint="#66000000"
+            android:textSize="15sp" >
+
+            <requestFocus />
+        </EditText>
+
+        <TextView
+            android:id="@+id/invalidUsernameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text=""
+            android:textColor="#EE0000" />
+
+        <EditText
+            android:id="@+id/loginPassword"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal|center_vertical"
+            android:background="#F0F0F0"
+            android:layout_marginBottom="5dp"
+            android:ems="14"
+            android:hint="@string/enterPassword"
+            android:inputType="textPassword"
+            android:singleLine="true"
+            android:textColorHint="#66000000"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/signInButton"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:layout_marginTop="10dp"
+            android:background="#F0F0F0"
+            android:onClick="onClick"
+            android:text="@string/Sign_In" />
+
+    </LinearLayout>
+
+        <TextView
         android:id="@+id/createAccount"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignEnd="@+id/signInButton"
-        android:layout_alignRight="@+id/signInButton"
-        android:layout_below="@+id/signInButton"
         android:layout_marginTop="16dp"
-        android:clickable="true"
+        android:clickable="false"
         android:onClick="onClick"
-        android:text="@string/createAccount"
+        android:text=""
         android:textColor="#EEEEEE"
         android:textSize="@dimen/createAccount" />
 
-    <TextView
-        android:id="@+id/invalidUsernameTextView"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_above="@+id/loginPassword"
-        android:layout_alignStart="@+id/loginPassword"
-        android:layout_alignLeft="@+id/loginPassword"
-        android:text=""
-        android:textColor="#EE0000" />
-
-</RelativeLayout>
+</LinearLayout>

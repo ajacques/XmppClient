@@ -3,6 +3,8 @@ package net.technowizardry.xmppclient;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 import scala.Function1;
 import scala.Function2;
@@ -23,6 +25,7 @@ import net.technowizardry.xmpp.XmppSession;
 import net.technowizardry.xmppclient.networking.XmppSocketFactory;
 import net.technowizardry.xmppclient.ui.HomeActivity;
 import net.technowizardry.xmppclient.ui.LoginActivity;
+import net.technowizardry.xmppclient.ui.NewConversationActivity;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
@@ -40,7 +43,7 @@ public class ConnectionManagerService extends Service {
 	private String domain;
 	private String localName;
 	private String password;
-	private XmppConnection connection;
+	private static XmppConnection connection;
 	private XmppSocketFactory factory;
 	private static XmppSession session;
 	private static Iterable<XmppContact> theRoster;
@@ -64,12 +67,13 @@ public class ConnectionManagerService extends Service {
 			localName = intent.getStringExtra("localName");
 			password = intent.getStringExtra("password");
 		}
-		ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
-		NetworkInfo netInfo = cm.getActiveNetworkInfo();
-		if(netInfo != null && netInfo.isConnected()) {
-			XmppConnect();
+		if (domain != null) {
+			ConnectivityManager cm = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+			NetworkInfo netInfo = cm.getActiveNetworkInfo();
+			if(netInfo != null && netInfo.isConnected()) {
+				XmppConnect();
+			}
 		}
-
 		return Service.START_STICKY;
 	}
 
@@ -113,7 +117,9 @@ public class ConnectionManagerService extends Service {
 		};
 		t.start();
 	}
-
+	public static void addNewContact(Jid jid) {
+		session.SendRequest(jid);
+	}
 	private void rosterComplete() {
 		isLoading = true;
 		Intent broadcast = new Intent();
@@ -146,15 +152,17 @@ public class ConnectionManagerService extends Service {
 		Function2<Jid, String, BoxedUnit> messageCallback = new AbstractFunction2<Jid, String, BoxedUnit>() {
 			@Override
 			public BoxedUnit apply(Jid jid, String message) {
-				System.out.println("New Message from: " + jid.toString() + ": " + message.toString());
 				receivedMessage(jid, message);
 				return null;
 			}
 		};
 		session.MessageReceivedCallback_$eq(messageCallback);
+
 		Function4<Jid, String, String, Integer, BoxedUnit> presenceCallback = new AbstractFunction4<Jid, String, String, Integer, BoxedUnit>() {
 			@Override
 			public BoxedUnit apply(Jid arg0, String arg1, String arg2, Integer arg3) {
+				if(arg1 == "subscribe")
+					receivedRequest(arg0, arg1, arg2, arg3);
 				System.out.println("New presence update from: " + arg0.toString() + " Classification: " + arg1 + " Status: " + arg2 + " Priority: " + arg2);
 				return null;
 			}
@@ -169,11 +177,17 @@ public class ConnectionManagerService extends Service {
 			return true;
 	}
 	public void receivedMessage(Jid jid, String message) {
-		newNotification(jid.Username(), message);
+		newNotification(jid.Username(), message, true);
 		MessageHistory.AddToHistory(this, jid, jid, message);
-		System.out.println("RECIEVED MESSAGE");
 		if(ConnectionManagerService.isStarted() && !isLoading) {
-			HomeActivity.newMessage(jid, message, "Now", false);
+			HomeActivity.newMessage(jid, message, new SimpleDateFormat("EEE MMM dd HH:mm:ss z yyyy").format(new Date()), false);
+		}
+	}
+
+	public void receivedRequest(Jid jid, String classification, String status, Integer priority) {
+		newNotification(jid.Username(), "Subscription Request", false);
+		if(ConnectionManagerService.isStarted() && !isLoading) {
+			NewConversationActivity.newSubscriptionRequest(jid);
 		}
 	}
 
@@ -200,15 +214,21 @@ public class ConnectionManagerService extends Service {
 		t.start();
 	}
 
-	private void newNotification(String sender, String message) {
-		Notification.Builder mBuilder = new Notification.Builder(this)
+	private void newNotification(String sender, String message, boolean isMessage) {
+		Notification.Builder mBuilder= new Notification.Builder(this)
 			.setContentTitle("New Message From " + sender)
 			.setContentText(message)
-			.setSmallIcon(R.drawable.ic_launcher)
+			.setSmallIcon(R.drawable.batchat_logo)
 			.setAutoCancel(true);
+		if(!isMessage) {
+			mBuilder= new Notification.Builder(this)
+				.setContentTitle("New Subscription From " + sender)
+				.setContentText(message)
+				.setSmallIcon(R.drawable.batchat_logo)
+				.setAutoCancel(true);
+		}
 
-		//currently going to start the loginactivity which will direct to the home activity.
-		//need to make this go to the actual chat.
+		//currently going to start the login activity which will direct to the home activity.
 		Intent resultIntent = new Intent(this, LoginActivity.class);
 		TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
 		stackBuilder.addParentStack(LoginActivity.class);
@@ -219,6 +239,10 @@ public class ConnectionManagerService extends Service {
 		NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 		final int NOTI_ID = 1;
 		mNotificationManager.notify(NOTI_ID, mBuilder.build());
+	}
+
+	public static void logout() {
+		connection.Disconnect();
 	}
 
 	@Override
