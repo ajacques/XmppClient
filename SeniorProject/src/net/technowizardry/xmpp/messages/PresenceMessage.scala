@@ -33,6 +33,7 @@ class PresenceMessage(to : Jid, ptype : String) extends XmppProtocolMessage with
 	def WriteMessage(writer: XMLWriter) {
 		writer.WriteStartElement("presence", XmppNamespaces.Jabber)
 		writer.WriteAttribute("to", to.toString(), null)
+		writer.WriteAttribute("type", ptype, null)
 		writer.WriteEndElement()
 	}
 }
