@@ -1,6 +1,7 @@
 package net.technowizardry.xmppclient.ui;
 
 import net.technowizardry.xmpp.Jid;
+import net.technowizardry.xmppclient.ConnectionManagerService;
 import net.technowizardry.xmppclient.R;
 import android.app.Fragment;
 import android.os.Bundle;
@@ -36,10 +37,12 @@ public class SubscriptionFragment extends Fragment implements OnClickListener {
 	public void onClick(View v) {
 		switch(v.getId()){
 			case R.id.subContactAccept:
-				//finish
+				ConnectionManagerService.acceptSubRequest(jid);
+				ConnectionManagerService.pendingSubscriptions.remove(jid);
 				break;
 			case R.id.subContactDecline:
-				//finish
+				NewConversationActivity.declineSubRequest(jid);
+				ConnectionManagerService.pendingSubscriptions.remove(jid);
 				break;
 		}
 	}

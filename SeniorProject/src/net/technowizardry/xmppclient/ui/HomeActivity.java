@@ -28,7 +28,6 @@ public class HomeActivity extends Activity {
 	private String domainName;
 	private String password;
 	private static FragmentManager fragmentManager;
-	private static FragmentTransaction fragmentTransaction;
 	private static boolean isActive;
 
 	@Override
@@ -56,7 +55,7 @@ public class HomeActivity extends Activity {
 
 	public static void newMessage(Jid jid, String message, String date, Boolean isLocal) {
 		Fragment frag = fragmentManager.findFragmentByTag(jid.GetBareJid().toString());
-		fragmentTransaction = fragmentManager.beginTransaction();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		ConversationFragment fragment = new ConversationFragment(jid.GetBareJid().Username(), jid.GetBareJid().Domain(), message, date);
 		if (frag == null) {
 			fragmentTransaction.add(R.id.homeMainLLayout , fragment, jid.GetBareJid().toString());
@@ -71,7 +70,7 @@ public class HomeActivity extends Activity {
 	}
 
 	private void loadConversations() {
-		fragmentTransaction = fragmentManager.beginTransaction();
+		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		Iterable<XmppContact> roster;
 		roster = ConnectionManagerService.getRoster();
 		for (XmppContact contact : roster) {
@@ -82,7 +81,7 @@ public class HomeActivity extends Activity {
 				ConversationFragment fragment = new ConversationFragment(contact.Username().GetBareJid().Username(),
 						contact.Username().GetBareJid().Domain(), m.Message(), m.Date().toString());
 				if (frag == null) {
-					fragmentTransaction.add(R.id.homeMainLLayout , fragment, contact.Username().GetBareJid().toString());
+					fragmentTransaction.add(R.id.homeMainLLayout, fragment, contact.Username().GetBareJid().toString());
 				}
 				else {
 					fragmentTransaction.replace(R.id.homeMainLLayout, fragment, contact.Username().GetBareJid().toString());
@@ -91,10 +90,27 @@ public class HomeActivity extends Activity {
 		}
 		fragmentTransaction.commit();
 		ConnectionManagerService.isLoading = false;
+		refresh();
+	}
+
+	private void refresh() {
+		Thread t = new Thread(){
+			public void run() {
+				while(isActive) {
+					try {
+						Thread.sleep(90000);
+						if(isActive)
+							loadConversations();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		t.start();
 	}
 
 	private void connectionFailed() {
-		//need to restart loginActivity as well.....
 		Intent nextIntent = new Intent(getApplicationContext(), LoginActivity.class);
 		nextIntent.putExtra("failed", true);
 		startActivity(nextIntent);
@@ -107,6 +123,10 @@ public class HomeActivity extends Activity {
 		connectionManagerIntent.putExtra("localName", localName);
 		connectionManagerIntent.putExtra("password", password);
 		startService(connectionManagerIntent);
+	}
+
+	public static void newSubscriptionRequest(Jid jid) {
+		NewConversationActivity.newSubscriptionRequest(jid);
 	}
 
 	private BroadcastReceiver connectionReceiver = new BroadcastReceiver() {

@@ -24,7 +24,6 @@ public class MessageFragment extends Fragment {
 		this.message = message;
 		this.date = date;
 		this.isLocalUser = isLocalUser;
-		System.out.println(date);
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

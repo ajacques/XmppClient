@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 import scala.Function1;
@@ -49,6 +50,7 @@ public class ConnectionManagerService extends Service {
 	private static Iterable<XmppContact> theRoster;
 	public static final String BROADCAST_ACTION = "net.technowizardry.xmppclient.BROADCAST";
 	public static boolean isLoading = false;
+	public static ArrayList<Jid> pendingSubscriptions = new ArrayList<Jid>();
 
 	public ConnectionManagerService() {
 		super();
@@ -118,8 +120,25 @@ public class ConnectionManagerService extends Service {
 		t.start();
 	}
 	public static void addNewContact(Jid jid) {
-		session.SendRequest(jid);
+		final Jid c = jid;
+		Thread t = new Thread(){
+			public void run() {
+				session.SendRequest(c);
+			}
+		};
+		t.start();
 	}
+
+	public static void acceptSubRequest(Jid jid) {
+		final Jid j = jid;
+		Thread t = new Thread(){
+			public void run() {
+				session.ApproveSubscriptionRequest(j);
+			}
+		};
+		t.start();
+	}
+
 	private void rosterComplete() {
 		isLoading = true;
 		Intent broadcast = new Intent();
@@ -161,7 +180,7 @@ public class ConnectionManagerService extends Service {
 		Function4<Jid, String, String, Integer, BoxedUnit> presenceCallback = new AbstractFunction4<Jid, String, String, Integer, BoxedUnit>() {
 			@Override
 			public BoxedUnit apply(Jid arg0, String arg1, String arg2, Integer arg3) {
-				if(arg1 == "subscribe")
+				if(arg1 != null && arg1.equals("subscribe"))
 					receivedRequest(arg0, arg1, arg2, arg3);
 				System.out.println("New presence update from: " + arg0.toString() + " Classification: " + arg1 + " Status: " + arg2 + " Priority: " + arg2);
 				return null;
@@ -187,7 +206,8 @@ public class ConnectionManagerService extends Service {
 	public void receivedRequest(Jid jid, String classification, String status, Integer priority) {
 		newNotification(jid.Username(), "Subscription Request", false);
 		if(ConnectionManagerService.isStarted() && !isLoading) {
-			NewConversationActivity.newSubscriptionRequest(jid);
+			pendingSubscriptions.add(jid);
+			HomeActivity.newSubscriptionRequest(jid);
 		}
 	}
 
@@ -202,10 +222,26 @@ public class ConnectionManagerService extends Service {
 		return theRoster;
 	}
 
+	public static Iterable<XmppContact> getUpdatedroster() {
+		Thread t = new Thread(){
+			public void run() {
+				Function1<List<XmppContact>, BoxedUnit> rosterCallback = new AbstractFunction1<List<XmppContact>, BoxedUnit>() {
+					@Override
+					public BoxedUnit apply(List<XmppContact> contacts) {
+						theRoster = JavaConversions.asJavaIterable(contacts);
+						return null;
+					}
+				};
+				session.FetchRoster(rosterCallback);
+			}
+		};
+		t.start();
+		return theRoster;
+	}
+
 	public static void sendMessage(Jid contact, String message) {
 		final Jid c = contact;
 		final String m = message;
-
 		Thread t = new Thread(){
 			public void run() {
 				session.SendMessageTo(c, m);

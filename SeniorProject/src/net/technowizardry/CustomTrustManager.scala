@@ -9,7 +9,7 @@ class CustomTrustManager extends X509TrustManager {
 	val ks = KeyStore.getInstance(KeyStore.getDefaultType())
 	val algo = TrustManagerFactory.getDefaultAlgorithm()
 	val factory = TrustManagerFactory.getInstance(algo)
-	factory.init(ks)
+	factory.init(Stuff.NULL_KEYSTORE)
 	val tr = factory.getTrustManagers()
 	val trustMgr = factory.getTrustManagers().find(f => f.isInstanceOf[X509TrustManager]).get match {
 		case x : X509TrustManager => x

@@ -20,6 +20,7 @@ import android.widget.Toast;
 
 public class NewConversationActivity extends Activity {
 	private static FragmentManager fragmentManager;
+	public static boolean isActive;
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.contact_list);
@@ -27,6 +28,7 @@ public class NewConversationActivity extends Activity {
 		mActionBar.setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM);
 		mActionBar.setCustomView(R.layout.actionbar_contact);
 		fragmentManager = getFragmentManager();
+		isActive = true;
 		loadRoster();
 	}
 
@@ -34,22 +36,32 @@ public class NewConversationActivity extends Activity {
 		FragmentTransaction fragmentTransaction;
 		fragmentTransaction = fragmentManager.beginTransaction();
 
+		for (Jid j : ConnectionManagerService.pendingSubscriptions) {
+			SubscriptionFragment fragment = new SubscriptionFragment(j);
+			fragmentTransaction.add(R.id.contactMainLLayout, fragment, j.GetBareJid().toString());
+		}
+
 		Iterable<XmppContact> roster;
-		roster = ConnectionManagerService.getRoster();
+		roster = ConnectionManagerService.getUpdatedroster();
 		for (XmppContact contact : roster) {
 			ContactFragment fragment = new ContactFragment(contact.Username());
-			fragmentTransaction.add(R.id.contactMainLLayout , fragment);
+			fragmentTransaction.add(R.id.contactMainLLayout, fragment, contact.Username().GetBareJid().toString());
 		}
+
 		fragmentTransaction.commit();
 	}
 
-	private void addContact(String username) {
+	private void addContact() {
+		EditText newContactText = (EditText)findViewById(R.id.actionbarContactText);
+		String username = newContactText.getText().toString().trim();
 		int index = username.indexOf("@");
 		String domainName = (index == -1) ? "" : username.substring(index+1, username.length());
 		if (domainName != "") {
 			String localName = username.substring(0,index);
 			Jid newContact = new Jid(localName,domainName);
 			ConnectionManagerService.addNewContact(newContact);
+			Toast.makeText(getBaseContext(),  "Request sent to " + username, Toast.LENGTH_LONG).show();
+			newContactText.setText("");
 		}
 		else {
 			Toast.makeText(getBaseContext(), "Need a domain name to add a contact", Toast.LENGTH_LONG).show();
@@ -57,10 +69,21 @@ public class NewConversationActivity extends Activity {
 	}
 
 	public static void newSubscriptionRequest(Jid jid) {
+		if (isActive) {
+			FragmentTransaction fragmentTransaction;
+			fragmentTransaction = fragmentManager.beginTransaction();
+			SubscriptionFragment fragment = new SubscriptionFragment(jid);
+			fragmentTransaction.add(R.id.contactMainLLayout, fragment, jid.GetBareJid().toString());
+			fragmentTransaction.commit();
+		}
+
+	}
+
+	public static void declineSubRequest(Jid jid) {
 		FragmentTransaction fragmentTransaction;
 		fragmentTransaction = fragmentManager.beginTransaction();
 		SubscriptionFragment fragment = new SubscriptionFragment(jid);
-		fragmentTransaction.add(R.id.contactMainLLayout , fragment);
+		fragmentTransaction.remove(fragment);
 		fragmentTransaction.commit();
 	}
 
@@ -80,9 +103,7 @@ public class NewConversationActivity extends Activity {
 		switch(item.getItemId())
 		{
 		case R.id.actionNewContact:
-			EditText newContactText = (EditText)findViewById(R.id.actionbarContactText);
-			String username = newContactText.getText().toString().trim();
-			addContact(username);
+			addContact();
 			return true;
 		case R.id.action_settings:
 			Toast.makeText(getBaseContext(),  "clicked action settings button", Toast.LENGTH_LONG).show();
@@ -99,5 +120,18 @@ public class NewConversationActivity extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	protected void onResume() {
+		super.onResume();
+		isActive = true;
+	}
+	protected void onDestroy() {
+		super.onDestroy();
+		isActive = false;
+	}
+	protected void onPause() {
+		super.onPause();
+		isActive = false;
 	}
 }

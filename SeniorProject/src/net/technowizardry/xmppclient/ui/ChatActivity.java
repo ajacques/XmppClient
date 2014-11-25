@@ -46,6 +46,7 @@ public class ChatActivity extends Activity {
 		contact = new Jid(localName, domainName);
 		fragmentManager = getFragmentManager();
 		loadConversation();
+		refresh();
 
 		sendButton = (ImageButton)findViewById(R.id.sendButton);
 		sendButton.setOnClickListener(new View.OnClickListener() {
@@ -91,6 +92,7 @@ public class ChatActivity extends Activity {
 			}
 		});
 	}
+
 	public static void loadMessage(Jid sender, String message, String date, boolean isLocal) {
 		if (isActive) {
 			fragmentTransaction = fragmentManager.beginTransaction();
@@ -98,6 +100,23 @@ public class ChatActivity extends Activity {
 			fragmentTransaction.add(R.id.chatMainLLayout, frag, "one");
 			fragmentTransaction.commit();
 		}
+	}
+
+	private void refresh() {
+		Thread t = new Thread(){
+			public void run() {
+				while(isActive) {
+					try {
+						Thread.sleep(90000);
+						if(isActive)
+							loadConversation();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			}
+		};
+		t.start();
 	}
 
 	@Override
