@@ -31,6 +31,7 @@ class XmppSession(connection : XmppConnection) {
 	def SendMessageTo(jid : Jid, message : String) {
 		connection.SendMessageImmediately(new ChatMessage(jid, message))
 	}
+	def Roster = new XmppRoster(this)
 	private def HandlePresenceMessage(message : XmppProtocolMessage) {
 		val msg = message match {
 			case x : PresenceUpdateMessage => x

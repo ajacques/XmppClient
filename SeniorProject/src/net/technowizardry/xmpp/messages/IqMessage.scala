@@ -33,6 +33,17 @@ class RosterList(contacts : List[XmppContact]) extends IqResponseBody {
 
 class RosterResponse extends IqResponseBody {}
 
+class RosterModification(jid : Jid, change : String) extends IqRequestBody {
+	def WriteMessage(writer : XMLWriter) {
+		writer.WriteStartElement("query", "jabber:iq:roster")
+		writer.WriteStartElement("item", null)
+		writer.WriteAttribute("jid", jid.toString(), null)
+		writer.WriteAttribute("subscription", change, null)
+		writer.WriteEndElement()
+		writer.WriteEndElement()
+	}
+}
+
 object IqParser {
 	val parsers = Map[String, XMLReader => IqResponseBody](XmppNamespaces.Roster -> UnpackRoster)
 
