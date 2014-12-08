@@ -29,6 +29,7 @@
         android:id="@+id/subContactAccept"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:background="#26C6DA"
         android:contentDescription="@string/userImage"
         android:src="@drawable/ic_action_accept" />
 
@@ -36,6 +37,7 @@
         android:id="@+id/subContactDecline"
         android:layout_width="50dp"
         android:layout_height="50dp"
+        android:background="#BFBFBF"
         android:contentDescription="@string/userImage"
         android:src="@drawable/ic_action_cancel" />
 

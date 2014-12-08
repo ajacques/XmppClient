@@ -11,6 +11,7 @@ import net.technowizardry.xmppclient.Message;
 import net.technowizardry.xmppclient.MessageHistory;
 import net.technowizardry.xmppclient.R;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.os.Bundle;
@@ -94,10 +95,19 @@ public class ChatActivity extends Activity {
 	}
 
 	public static void loadMessage(Jid sender, String message, String date, boolean isLocal) {
+		Fragment frag = fragmentManager.findFragmentByTag(sender.GetBareJid().toString());
+
 		if (isActive) {
 			fragmentTransaction = fragmentManager.beginTransaction();
-			MessageFragment frag = new MessageFragment(message, date, isLocal);
-			fragmentTransaction.add(R.id.chatMainLLayout, frag, "one");
+			MessageFragment fragment = new MessageFragment(message, date, isLocal);
+			fragmentTransaction.remove(fragment);
+			if (frag == null) {
+				fragmentTransaction.add(R.id.chatMainLLayout, fragment, sender.GetBareJid().toString());
+			}
+			else {
+				fragmentTransaction.remove(fragment);
+				fragmentTransaction.add(R.id.chatMainLLayout, fragment, sender.GetBareJid().toString());
+			}
 			fragmentTransaction.commit();
 		}
 	}
@@ -156,6 +166,7 @@ public class ChatActivity extends Activity {
 	protected void onResume() {
 		super.onResume();
 		isActive = true;
+		loadConversation();
 	}
 
 	protected void onPause() {

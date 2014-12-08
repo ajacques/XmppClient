@@ -6,6 +6,7 @@ import net.technowizardry.xmppclient.ConnectionManagerService;
 import net.technowizardry.xmppclient.R;
 import android.app.ActionBar;
 import android.app.Activity;
+import android.app.Fragment;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
@@ -79,11 +80,23 @@ public class NewConversationActivity extends Activity {
 
 	}
 
-	public static void declineSubRequest(Jid jid) {
+	public static void removeSubRequest(Jid jid) {
 		FragmentTransaction fragmentTransaction;
 		fragmentTransaction = fragmentManager.beginTransaction();
-		SubscriptionFragment fragment = new SubscriptionFragment(jid);
-		fragmentTransaction.remove(fragment);
+		Fragment fragReq = fragmentManager.findFragmentByTag(jid.GetBareJid().toString());
+		fragmentTransaction.remove(fragReq);
+		for (Jid j : ConnectionManagerService.pendingSubscriptions) {
+			Fragment frag = fragmentManager.findFragmentByTag(j.GetBareJid().toString());
+			SubscriptionFragment fragment = new SubscriptionFragment(j);
+			if(frag == null) {
+				fragmentTransaction.add(R.id.contactMainLLayout, fragment, j.GetBareJid().toString());
+			}
+			else {
+				fragmentTransaction.remove(fragment);
+				fragmentTransaction.add(R.id.contactMainLLayout, fragment, j.GetBareJid().toString());
+			}
+		}
+
 		fragmentTransaction.commit();
 	}
 

@@ -36,8 +36,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.media.RingtoneManager;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.Uri;
 import android.os.IBinder;
 
 public class ConnectionManagerService extends Service {
@@ -58,7 +60,7 @@ public class ConnectionManagerService extends Service {
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		super.onStartCommand(intent, flags, startId);
-		SharedPreferences pref = getApplicationContext().getSharedPreferences("MyProperties", 0);
+		SharedPreferences pref = getSharedPreferences("MyProperties", 0);
 		if(pref.getBoolean("loggedIn", false)) {
 			domain = pref.getString("domainName", null);
 			localName = pref.getString("localName", null);
@@ -251,16 +253,22 @@ public class ConnectionManagerService extends Service {
 	}
 
 	private void newNotification(String sender, String message, boolean isMessage) {
+		Uri soundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
+
 		Notification.Builder mBuilder= new Notification.Builder(this)
 			.setContentTitle("New Message From " + sender)
 			.setContentText(message)
 			.setSmallIcon(R.drawable.batchat_logo)
+			.setSound(soundUri)
+			.setDefaults(Notification.DEFAULT_VIBRATE)
 			.setAutoCancel(true);
 		if(!isMessage) {
 			mBuilder= new Notification.Builder(this)
 				.setContentTitle("New Subscription From " + sender)
 				.setContentText(message)
 				.setSmallIcon(R.drawable.batchat_logo)
+				.setSound(soundUri)
+				.setDefaults(Notification.DEFAULT_VIBRATE)
 				.setAutoCancel(true);
 		}
 
@@ -278,12 +286,23 @@ public class ConnectionManagerService extends Service {
 	}
 
 	public static void logout() {
-		connection.Disconnect();
+		Thread t = new Thread(){
+			public void run() {
+				connection.Disconnect();
+			}
+		};
+		t.start();
+
 	}
 
 	@Override
 	public void onDestroy() {
-		connection.Disconnect();
+		Thread t = new Thread(){
+			public void run() {
+				connection.Disconnect();
+			}
+		};
+		t.start();
 		super.onDestroy();
 	}
 

@@ -116,7 +116,6 @@ public class LoginActivity extends Activity {
 			}
 			else {
 				localName = username.substring(0,index);
-
 				performSRVCheck SRVCheck = new performSRVCheck(getApplicationContext());
 				SRVCheck.execute(domainName);
 			}

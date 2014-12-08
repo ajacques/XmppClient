@@ -29,6 +29,7 @@ public class HomeActivity extends Activity {
 	private String password;
 	private static FragmentManager fragmentManager;
 	private static boolean isActive;
+	private static Context getCon;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -40,6 +41,7 @@ public class HomeActivity extends Activity {
 		setContentView(R.layout.login_loading);
 		fragmentManager = getFragmentManager();
 		SharedPreferences pref = getApplicationContext().getSharedPreferences("MyProperties", 0);
+		getCon = getBaseContext();
 		if(!pref.getBoolean("loggedIn", false) || !ConnectionManagerService.isStarted()) {
 			startConnectivityManager();
 		}
@@ -54,27 +56,16 @@ public class HomeActivity extends Activity {
 	}
 
 	public static void newMessage(Jid jid, String message, String date, Boolean isLocal) {
-		Fragment frag = fragmentManager.findFragmentByTag(jid.GetBareJid().toString());
-		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-		ConversationFragment fragment = new ConversationFragment(jid.GetBareJid().Username(), jid.GetBareJid().Domain(), message, date);
-		if (frag == null) {
-			fragmentTransaction.add(R.id.homeMainLLayout , fragment, jid.GetBareJid().toString());
-		}
-		else {
-			fragmentTransaction.replace(R.id.homeMainLLayout, fragment, jid.GetBareJid().toString());
-		}
-		if (isActive) {
-			fragmentTransaction.commit();
-		}
+		loadConversations();
 		ChatActivity.loadMessage(jid, message, date, isLocal);
 	}
 
-	private void loadConversations() {
+	private static void loadConversations() {
 		FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 		Iterable<XmppContact> roster;
 		roster = ConnectionManagerService.getRoster();
 		for (XmppContact contact : roster) {
-			List<Message> messages = MessageHistory.GetHistory(this, contact.Username().GetBareJid());
+			List<Message> messages = MessageHistory.GetHistory(getCon, contact.Username().GetBareJid());
 			if (!messages.isEmpty()) {
 				Message m = messages.last();
 				Fragment frag = fragmentManager.findFragmentByTag(contact.Username().GetBareJid().toString());
@@ -88,12 +79,14 @@ public class HomeActivity extends Activity {
 				}
 			}
 		}
-		fragmentTransaction.commit();
+		if (isActive) {
+			fragmentTransaction.commit();
+		}
 		ConnectionManagerService.isLoading = false;
 		refresh();
 	}
 
-	private void refresh() {
+	private static void refresh() {
 		Thread t = new Thread(){
 			public void run() {
 				while(isActive) {
@@ -118,7 +111,8 @@ public class HomeActivity extends Activity {
 	}
 
 	private void startConnectivityManager() {
-		Intent connectionManagerIntent = new Intent(getApplicationContext(), ConnectionManagerService.class);
+		Intent connectionManagerIntent = new Intent(this, ConnectionManagerService.class);
+		stopService(connectionManagerIntent);
 		connectionManagerIntent.putExtra("domainName", domainName);
 		connectionManagerIntent.putExtra("localName", localName);
 		connectionManagerIntent.putExtra("password", password);
@@ -166,13 +160,15 @@ public class HomeActivity extends Activity {
 			Toast.makeText(getBaseContext(),  "clicked action settings button", Toast.LENGTH_LONG).show();
 			return true;
 		case R.id.action_logout:
+			ConnectionManagerService.logout();
 			SharedPreferences pref = getApplicationContext().getSharedPreferences("MyProperties", 0);
 			Editor editor = pref.edit();
 			editor.clear();
 			editor.commit();
 			Intent logoutIntent = new Intent(getApplicationContext(), LoginActivity.class);
 			startActivity(logoutIntent);
-			ConnectionManagerService.logout();
+			stopService(new Intent(getApplicationContext(), ConnectionManagerService.class));
+			System.exit(0);
 			finish();
 			return true;
 		}

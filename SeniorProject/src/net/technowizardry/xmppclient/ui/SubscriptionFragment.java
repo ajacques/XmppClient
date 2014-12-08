@@ -37,12 +37,13 @@ public class SubscriptionFragment extends Fragment implements OnClickListener {
 	public void onClick(View v) {
 		switch(v.getId()){
 			case R.id.subContactAccept:
-				ConnectionManagerService.acceptSubRequest(jid);
 				ConnectionManagerService.pendingSubscriptions.remove(jid);
+				ConnectionManagerService.acceptSubRequest(jid);
+				NewConversationActivity.removeSubRequest(jid);
 				break;
 			case R.id.subContactDecline:
-				NewConversationActivity.declineSubRequest(jid);
 				ConnectionManagerService.pendingSubscriptions.remove(jid);
+				NewConversationActivity.removeSubRequest(jid);
 				break;
 		}
 	}
