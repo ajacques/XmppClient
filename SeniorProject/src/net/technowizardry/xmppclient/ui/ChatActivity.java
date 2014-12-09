@@ -25,12 +25,14 @@ import android.content.SharedPreferences.Editor;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.ScrollView;
 
 public class ChatActivity extends Activity {
 	private ImageButton sendButton;
 	private Jid contact;
 	private static FragmentManager fragmentManager;
+	private static LinearLayout rem;
 	private static FragmentTransaction fragmentTransaction;
 	private static boolean isActive;
 
@@ -43,6 +45,7 @@ public class ChatActivity extends Activity {
 		ActionBar ab = getActionBar();
 		ab.setDisplayHomeAsUpEnabled(true);
 		ab.setTitle(localName);
+		rem = (LinearLayout) findViewById(R.id.chatMainLLayout);
 
 		contact = new Jid(localName, domainName);
 		fragmentManager = getFragmentManager();
@@ -72,16 +75,22 @@ public class ChatActivity extends Activity {
 	}
 
 	private void loadConversation() {
-		List<Message> conversation = MessageHistory.GetHistory(this, contact);
-		for (Message message : JavaConversions.asJavaCollection(conversation)) {
-			if(message.Source().toString().equals(contact.toString())) {
-				loadMessage(message.Source(), message.Message(), message.Date().toString(), false);
+		this.runOnUiThread(new Runnable() {
+			public void run() {
+				rem.removeAllViews();
+				List<Message> conversation = MessageHistory.GetHistory(ChatActivity.this, contact);
+				for (Message message : JavaConversions.asJavaCollection(conversation)) {
+					
+					if(message.Source().toString().equals(contact.toString())) {
+						loadMessage(message.Source(), message.Message(), message.Date().toString(), false);
+					}
+					else {
+						loadMessage(message.Source(), message.Message(), message.Date().toString(), true);
+					}
+				}
+				scrollDown();
 			}
-			else {
-				loadMessage(message.Source(), message.Message(), message.Date().toString(), true);
-			}
-		}
-		scrollDown();
+		});
 	}
 
 	private void scrollDown() {
@@ -95,19 +104,12 @@ public class ChatActivity extends Activity {
 	}
 
 	public static void loadMessage(Jid sender, String message, String date, boolean isLocal) {
-		Fragment frag = fragmentManager.findFragmentByTag(sender.GetBareJid().toString());
-
+		
 		if (isActive) {
+			//Fragment frag = fragmentManager.findFragmentByTag(sender.GetBareJid().toString());
 			fragmentTransaction = fragmentManager.beginTransaction();
 			MessageFragment fragment = new MessageFragment(message, date, isLocal);
-			fragmentTransaction.remove(fragment);
-			if (frag == null) {
-				fragmentTransaction.add(R.id.chatMainLLayout, fragment, sender.GetBareJid().toString());
-			}
-			else {
-				fragmentTransaction.remove(fragment);
-				fragmentTransaction.add(R.id.chatMainLLayout, fragment, sender.GetBareJid().toString());
-			}
+			fragmentTransaction.add(R.id.chatMainLLayout, fragment, sender.GetBareJid().toString());
 			fragmentTransaction.commit();
 		}
 	}

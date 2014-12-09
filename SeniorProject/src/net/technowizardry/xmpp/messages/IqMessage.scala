@@ -38,7 +38,9 @@ class RosterModification(jid : Jid, change : String) extends IqRequestBody {
 		writer.WriteStartElement("query", "jabber:iq:roster")
 		writer.WriteStartElement("item", null)
 		writer.WriteAttribute("jid", jid.toString(), null)
-		writer.WriteAttribute("subscription", change, null)
+		if (change != null) {
+			writer.WriteAttribute("subscription", change, null)
+		}
 		writer.WriteEndElement()
 		writer.WriteEndElement()
 	}

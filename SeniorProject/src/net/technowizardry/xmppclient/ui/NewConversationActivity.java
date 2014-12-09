@@ -97,6 +97,9 @@ public class NewConversationActivity extends Activity {
 			}
 		}
 
+		ContactFragment fragment = new ContactFragment(jid);
+		fragmentTransaction.add(R.id.contactMainLLayout, fragment, jid.GetBareJid().toString());
+
 		fragmentTransaction.commit();
 	}
 

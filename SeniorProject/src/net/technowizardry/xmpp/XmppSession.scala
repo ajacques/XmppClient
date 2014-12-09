@@ -17,9 +17,11 @@ class XmppSession(connection : XmppConnection) {
 		connection.SendMessageImmediately(msg)
 	}
 	def ApproveSubscriptionRequest(jid : Jid) {
+		SendIqRequest(new RosterModification(jid, "from"), "set", NoopCallback);
 		connection.SendMessageImmediately(new PresenceMessage(jid, "subscribed"))
 	}
 	def SendRequest(jid : Jid) {
+		SendIqRequest(new RosterModification(jid, null), "set", NoopCallback);
 		connection.SendMessageImmediately(new PresenceMessage(jid, "subscribe"))
 	}
 	def UpdateOwnStatus(status : String, message : String, priority : Int) {

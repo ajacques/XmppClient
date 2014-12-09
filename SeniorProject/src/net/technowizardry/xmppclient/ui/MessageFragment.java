@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Locale;
+import java.util.regex.Pattern;
 
 import net.technowizardry.xmppclient.R;
 import android.app.Fragment;
@@ -24,6 +25,12 @@ public class MessageFragment extends Fragment {
 		this.message = message;
 		this.date = date;
 		this.isLocalUser = isLocalUser;
+
+		byte[] b = new byte[] { (byte)0xf0, (byte)0x9f, (byte)0x98, (byte)0x81 };
+		byte[] b2 = new byte[] { (byte)0xf0, (byte)0x9f, (byte)0x98, (byte)0x9e };
+
+		this.message = this.message.replaceAll(":-\\)", new String(b));
+		this.message = this.message.replaceAll(":-\\(", new String(b2));
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {

@@ -158,7 +158,7 @@ public class ConnectionManagerService extends Service {
 		editor.putString("password", password);
 		editor.commit();
 		session = new XmppSession(connection);
-		Function1<List<XmppContact>, BoxedUnit> rosterCallback = new AbstractFunction1<List<XmppContact>, BoxedUnit>() {
+		final Function1<List<XmppContact>, BoxedUnit> rosterCallback = new AbstractFunction1<List<XmppContact>, BoxedUnit>() {
 			@Override
 			public BoxedUnit apply(List<XmppContact> contacts) {
 				theRoster = JavaConversions.asJavaIterable(contacts);
@@ -184,6 +184,10 @@ public class ConnectionManagerService extends Service {
 			public BoxedUnit apply(Jid arg0, String arg1, String arg2, Integer arg3) {
 				if(arg1 != null && arg1.equals("subscribe"))
 					receivedRequest(arg0, arg1, arg2, arg3);
+				else if (arg1 != null && arg1.equals("subscribed")) {
+					session.SendRequest(arg0);
+					session.FetchRoster(rosterCallback);
+				}
 				System.out.println("New presence update from: " + arg0.toString() + " Classification: " + arg1 + " Status: " + arg2 + " Priority: " + arg2);
 				return null;
 			}
@@ -302,7 +306,7 @@ public class ConnectionManagerService extends Service {
 				connection.Disconnect();
 			}
 		};
-		t.start();
+		//t.start();
 		super.onDestroy();
 	}
 

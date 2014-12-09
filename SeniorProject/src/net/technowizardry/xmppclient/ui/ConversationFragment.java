@@ -29,6 +29,12 @@ public class ConversationFragment extends Fragment {
 		this.otherDomain = otherDomain;
 		this.message = message;
 		this.date = date;
+
+		byte[] b = new byte[] { (byte)0xf0, (byte)0x9f, (byte)0x98, (byte)0x81 };
+		byte[] b2 = new byte[] { (byte)0xf0, (byte)0x9f, (byte)0x98, (byte)0x9e };
+
+		this.message = this.message.replaceAll(":-\\)", new String(b));
+		this.message = this.message.replaceAll(":-\\(", new String(b2));
 	}
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
