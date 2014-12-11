@@ -58,6 +58,7 @@ public class ConversationFragment extends Fragment {
 			@Override
 			public void onClick(View view) {
 				clicked = new Intent(getActivity(), ChatActivity.class);
+				clicked.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK|Intent.FLAG_ACTIVITY_CLEAR_TOP);
 				clicked.putExtra("domain", otherDomain);
 				clicked.putExtra("local", otherId);
 				startActivity(clicked);
